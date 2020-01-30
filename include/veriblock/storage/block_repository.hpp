@@ -157,6 +157,8 @@ struct BlockRepository {
    * @param batch
    */
   virtual void commit(WriteBatch& batch) = 0;
+
+  bool contains(const hash_t& hash) const { return getByHash(hash, nullptr); }
 };
 
 }  // namespace VeriBlock

@@ -133,7 +133,7 @@ static const VTB validVTB = {
 
 TEST(StetlessValidation, checkBtcBlock_when_valid_test) {
   ValidationState state;
-  ASSERT_TRUE(checkBtcBlock(validBtcBlock, state));
+  ASSERT_TRUE(checkBlock(validBtcBlock, state));
 }
 
 TEST(StatelessValidation, checkBtcBlock_when_checkProofOfWork_invalid_test) {
@@ -152,7 +152,7 @@ TEST(StatelessValidation, checkBtcBlock_when_checkMaximumDrift_invalid_test) {
 
 TEST(StatelessValidation, checkVbkBlock_when_valid_test) {
   ValidationState state;
-  ASSERT_TRUE(checkVbkBlock(validVbkBlock, state));
+  ASSERT_TRUE(checkBlock(validVbkBlock, state));
 }
 
 TEST(StatelessValidation, checkVbkBlock_when_checkProofOfWork_invalid_test) {
