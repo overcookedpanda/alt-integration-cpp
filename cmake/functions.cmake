@@ -9,8 +9,9 @@ function(addtest test_name)
     add_executable(${test_name} ${ARGN})
     addtest_part(${test_name} ${ARGN})
     target_link_libraries(${test_name}
-            GTest::Main
-            GTest::GTest
+            gtest
+            gtest_main
+            gmock
             )
     add_test(
             NAME ${test_name}
@@ -34,7 +35,7 @@ function(addtest_part test_name)
             ${ARGN}
             )
     target_link_libraries(${test_name}
-            GTest::GTest
+            gtest
             )
 endfunction()
 

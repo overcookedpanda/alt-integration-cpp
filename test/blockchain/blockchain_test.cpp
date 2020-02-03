@@ -9,14 +9,14 @@ using namespace VeriBlock;
 
 template <typename Block>
 struct BlockchainTest : public ::testing::Test {
-  typename Blockchain<Block>::index_t bootstrap;
+  using index_t = typename Blockchain<Block>::index_t;
 
-  std::shared_ptr<BlockRepositoryMock<Block>> repo;
+  std::shared_ptr<BlockRepositoryMock<index_t>> repo;
   std::shared_ptr<Blockchain<Block>> blockchain;
 
   BlockchainTest() {
-    repo = std::make_shared<BlockRepositoryMock<Block>>();
-    blockchain = std::make_shared<Blockchain<Block>>(repo, bootstrap);
+    repo = std::make_shared<BlockRepositoryMock<index_t>>();
+    blockchain = std::make_shared<Blockchain<Block>>(repo);
   };
 };
 
@@ -72,8 +72,10 @@ static std::string BTCbootstraps =
 
 TYPED_TEST_SUITE_P(BlockchainTest);
 
-TYPED_TEST_P(BlockchainTest, BootstrapWorks) {}
+TYPED_TEST_P(BlockchainTest, BootstrapEmptyStore) {
 
-REGISTER_TYPED_TEST_SUITE_P(BlockchainTest, BootstrapWorks);
+}
+
+REGISTER_TYPED_TEST_SUITE_P(BlockchainTest, BootstrapEmptyStore);
 
 INSTANTIATE_TYPED_TEST_SUITE_P(Generic, BlockchainTest, BtcBlock);

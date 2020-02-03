@@ -1,2 +1,2 @@
-addtest(blockchain_test blockchain_test.cpp)
-target_link_libraries(blockchain_test vbkutils)
+addtest(btc_blockchain_test btc_blockchain_test.cpp)
+target_link_libraries(btc_blockchain_test vbkutils)

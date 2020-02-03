@@ -18,13 +18,11 @@ struct Blockchain {
   using hash_t = typename Block::hash_t;
   using height_t = typename Block::height_t;
 
-  Blockchain(std::shared_ptr<BlockRepository<index_t>> repo,
-             const index_t& bootstrapBlock)
-      : blocks_(std::move(repo)) {
-    // this one is to ensure that at given height we can have only one bootstrap
-    // block
-    blocks_->removeByHeight(bootstrapBlock.height);
-    insertBlockHeader(bootstrapBlock, false);
+  Blockchain(std::shared_ptr<BlockRepository<index_t>> repo)
+      : blocks_(std::move(repo)) {}
+
+  void bootstrap(const block_t& block) {
+    index_t index = insertBlockHeader(block, false);
     validateBlockchain(index);
   }
 
