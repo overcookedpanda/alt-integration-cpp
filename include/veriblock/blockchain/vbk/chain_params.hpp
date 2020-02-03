@@ -2,6 +2,7 @@
 #define ALT_INTEGRATION_INCLUDE_VERIBLOCK_BLOCKCHAIN_VBK_CHAIN_PARAMS_HPP_
 
 #include <memory>
+#include <veriblock/entities/vbkblock.hpp>
 #include <veriblock/uint.hpp>
 
 namespace VeriBlock {
@@ -23,6 +24,7 @@ struct VbkChainParams {
   virtual uint256 getMinimumDifficulty() const = 0;
   virtual VbkNetworkType getTransactionMagicByte() const noexcept = 0;
   virtual bool getPowNoRetargeting() const noexcept = 0;
+  virtual VbkBlock getGenesisBlock() const noexcept = 0;
 };
 
 /**
@@ -38,6 +40,12 @@ struct VbkChainParamsMain : public VbkChainParams {
     return {false, 0};
   }
   bool getPowNoRetargeting() const noexcept override { return false; }
+  VbkBlock getGenesisBlock() const noexcept override {
+     VbkBlock block;
+     // TODO: set valid block
+     return block;
+  }
+
 };
 
 /**
@@ -53,6 +61,11 @@ struct VbkChainParamsTest : public VbkChainParams {
     return {true, 0xAA};
   }
   bool getPowNoRetargeting() const noexcept override { return false; }
+  VbkBlock getGenesisBlock() const noexcept override {
+    VbkBlock block;
+    // TODO: set valid block
+    return block;
+  }
 };
 
 /**
@@ -68,6 +81,15 @@ struct VbkChainParamsRegTest : public VbkChainParams {
     return {true, 0xBB};
   }
   bool getPowNoRetargeting() const noexcept override { return true; }
+  VbkBlock getGenesisBlock() const noexcept override {
+    VbkBlock block;
+    block.height = 0;
+    block.version = 2;
+    block.timestamp = 1577367966;
+    // minumum possible difficulty
+    block.difficulty = 0x1010000;
+    return block;
+  }
 };
 
 /**
@@ -83,6 +105,11 @@ struct VbkChainParamsAlpha : public VbkChainParams {
     return {true, 0xAA};
   }
   bool getPowNoRetargeting() const noexcept override { return false; }
+  VbkBlock getGenesisBlock() const noexcept override {
+    VbkBlock block;
+    // TODO: set valid block
+    return block;
+  }
 };
 
 }  // namespace vbk

@@ -31,8 +31,8 @@ struct BlockIndex {
     header.toRaw(stream);
   }
 
-  static StoredBlock fromRaw(ReadStream& stream) {
-    StoredBlock index{};
+  static BlockIndex<Block> fromRaw(ReadStream& stream) {
+    BlockIndex<Block> index{};
     index.chainWork = readSingleByteLenValue(
         stream, ArithUint256::size(), ArithUint256::size());
     index.height = stream.readBE<uint32_t>();

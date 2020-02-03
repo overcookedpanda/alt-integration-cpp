@@ -13,6 +13,7 @@ struct BlockRepositoryMock : public BlockRepository<Block> {
   using hash_t = typename Block::hash_t;
   using height_t = typename Block::height_t;
   using batch_t = typename BlockRepository<Block>::WriteBatch;
+  using cursor_t = typename BlockRepository<Block>::cursor_t;
 
   ~BlockRepositoryMock() override = default;
 
@@ -34,6 +35,7 @@ struct BlockRepositoryMock : public BlockRepository<Block> {
   MOCK_METHOD1_T(removeByHash, bool(const hash_t& hash));
   MOCK_METHOD1_T(removeByHeight, size_t(height_t height));
   MOCK_METHOD0_T(newBatch, std::unique_ptr<batch_t>());
+  MOCK_METHOD0_T(getCursor, std::unique_ptr<cursor_t>());
   MOCK_METHOD1_T(commit, void(batch_t& batch));
 };
 

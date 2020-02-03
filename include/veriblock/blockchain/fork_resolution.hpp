@@ -18,12 +18,12 @@ void determineBestChain(std::shared_ptr<BlockIndex<BtcBlock>>* pindexBestHeader,
   }
 }
 
-void determineBestChain(std::shared_ptr<BlockIndex<VbkBlock>>* pindexBestHeader,
-                        const BlockIndex<VbkBlock>& indexNew) {
-  (void)pindexBestHeader;
-  (void)indexNew;
-  assert(false && "TODO: implement fork resolution for VBK");
-}
+//void determineBestChain(std::shared_ptr<BlockIndex<VbkBlock>>* pindexBestHeader,
+//                        const BlockIndex<VbkBlock>& indexNew) {
+//  (void)pindexBestHeader;
+//  (void)indexNew;
+//  assert(false && "TODO: implement fork resolution for VBK");
+//}
 
 }  // namespace VeriBlock
 

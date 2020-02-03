@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <veriblock/slice.hpp>
+#include <veriblock/storage/cursor.hpp>
 
 namespace VeriBlock {
 
@@ -51,6 +52,8 @@ struct BlockRepository {
   using hash_t = typename Block::hash_t;
   //! block height type
   using height_t = typename Block::height_t;
+  //! iterator type
+  using cursor_t = Cursor<height_t, stored_block_t>;
 
   virtual ~BlockRepository() = default;
 
@@ -157,6 +160,12 @@ struct BlockRepository {
    * @param batch
    */
   virtual void commit(WriteBatch& batch) = 0;
+
+  /**
+   * Returns iterator, that is used for height iteration over blockchain.
+   * @return
+   */
+  virtual std::unique_ptr<Cursor<height_t, stored_block_t>> getCursor() = 0;
 
   bool contains(const hash_t& hash) const { return getByHash(hash, nullptr); }
 };
