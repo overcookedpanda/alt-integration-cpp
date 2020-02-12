@@ -38,7 +38,6 @@ class BlockRepositoryRocks : public BlockRepository<Block> {
 
   bool put(const stored_block_t& block) override {
     // add hash -> block record
-
     std::string blockHash(reinterpret_cast<const char*>(block.hash.data()),
                           block.hash.size());
     std::string blockBytes = block.toRaw();
@@ -138,8 +137,8 @@ class BlockRepositoryRocks : public BlockRepository<Block> {
     return nullptr;
   }
 
-  std::shared_ptr<cursor_t> newCursor() override {
-    return nullptr;
+  std::shared_ptr<Cursor<height_t, stored_block_t>> getCursor() override {
+    return std::make_shared<CursorRocks>(*this);
   }
 
  private:
@@ -196,6 +195,63 @@ class BlockRepositoryRocks : public BlockRepository<Block> {
     }
     return result;
   }
+
+ private:
+  class CursorRocks : public Cursor<height_t, stored_block_t> {
+   private:
+    std::vector<rocksdb::Iterator*> rocks_its;
+
+   public:
+    CursorRocks(const BlockRepositoryRocks<stored_block_t>& repo) {
+      repo._db->NewIterators(
+          rocksdb::ReadOptions(),
+          {repo._heightHashesHandle.get(), repo._hashBlockHandle.get()},
+          &rocks_its);
+    }
+
+    void seekToFirst() override {
+      rocks_its[0]->SeekToFirst();
+      rocks_its[1]->SeekToFirst();
+    }
+
+    void seek(const height_t& key) override {
+      rocks_its[0]->Seek(std::to_string(key));
+      rocks_its[1]->Seek(rocks_its[0]->value().ToString());
+    }
+
+    void seekToLast() override {
+      rocks_its[0]->SeekToLast();
+      rocks_its[1]->SeekToLast();
+    }
+
+    bool isValid() const override {
+      return rocks_its[0]->Valid() && rocks_its[1]->Valid();
+    }
+
+    void next() override {
+      rocks_its[0]->Next();
+      rocks_its[1]->Next();
+    }
+
+    void prev() override {
+      rocks_its[0]->Prev();
+      rocks_its[1]->Prev();
+    }
+
+    height_t key() const override {
+      return std::stoi(rocks_its[0]->key().ToString());
+    }
+
+    stored_block_t value() const override {
+      return stored_block_t::fromRaw(rocks_its[1]->value().ToString());
+    }
+
+    ~CursorRocks() override {
+      for (const auto& it : rocks_its) {
+        delete it;
+      }
+    }
+  };
 };
 
 }  // namespace VeriBlock

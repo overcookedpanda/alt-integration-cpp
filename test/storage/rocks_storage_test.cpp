@@ -56,15 +56,17 @@ static std::vector<std::string> cfNames{"default",
                                         "hash_block_vbk"};
 
 static rocksdb::Status openDB() {
-  /// TODO: erase DB before opening otherwise it may fail if scheme was changed
-
   // prepare column families
   std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
   rocksdb::ColumnFamilyOptions cfOption{};
-  for (const std::string& cfName : cfNames) {
+  for (const std::string &cfName : cfNames) {
     rocksdb::ColumnFamilyDescriptor descriptor(cfName, cfOption);
     column_families.push_back(descriptor);
   }
+
+  // clear the DB
+  rocksdb::DestroyDB(dbName, rocksdb::Options(), column_families);
+
   cfHandles.clear();
   rocksdb::Options options;
   options.create_if_missing = true;
@@ -76,8 +78,7 @@ static rocksdb::Status openDB() {
 }
 
 // this class allows to properly close DB before opening it again
-class TestStorage : public ::testing::Test {
- protected:
+struct TestStorage : public ::testing::Test {
   std::shared_ptr<rocksdb::DB> dbPtr;
   std::vector<std::shared_ptr<rocksdb::ColumnFamilyHandle>> cfHandlePtrs;
   // block storage
@@ -86,7 +87,6 @@ class TestStorage : public ::testing::Test {
 
   void SetUp() {
     rocksdb::Status s = openDB();
-    ASSERT_TRUE(s.ok());
 
     // prepare smart pointers to look after DB cleanup
     dbPtr = std::shared_ptr<rocksdb::DB>(dbInstance);
@@ -106,8 +106,6 @@ class TestStorage : public ::testing::Test {
         cfHandlePtrs[(int)CF_NAMES::HEIGHT_HASHES_VBK],
         cfHandlePtrs[(int)CF_NAMES::HASH_BLOCK_VBK]);
   }
-
-  void TearDown() {}
 };
 
 TEST_F(TestStorage, SimplePut) {
@@ -228,4 +226,52 @@ TEST_F(TestStorage, RemovePartially) {
 
   readResult = repoBtc.getByHash(btcBlock2.getHash(), &readBlock);
   EXPECT_TRUE(readResult);
+}
+
+TEST_F(TestStorage, CursorTest) {
+  std::shared_ptr<Cursor<StoredBtcBlock::height_t, StoredBtcBlock>> cursor;
+  cursor = repoBtc.getCursor();
+
+  cursor->seekToFirst();
+  ASSERT_FALSE(cursor->isValid());
+
+  StoredBtcBlock storedBtcBlock1 = StoredBtcBlock::fromBlock(btcBlock1, 0);
+  StoredBtcBlock storedBtcBlock2 = StoredBtcBlock::fromBlock(btcBlock2, 1);
+
+  EXPECT_TRUE(repoBtc.put(storedBtcBlock1));
+  EXPECT_TRUE(repoBtc.put(storedBtcBlock2));
+
+  cursor = repoBtc.getCursor();
+
+  for (cursor->seekToFirst(); cursor->isValid(); cursor->next()) {
+    StoredBtcBlock stored_block = cursor->value();
+    EXPECT_TRUE(stored_block.block == storedBtcBlock1.block ||
+                stored_block.block == storedBtcBlock2.block);
+    EXPECT_TRUE(stored_block.height == storedBtcBlock1.height ||
+                stored_block.height == storedBtcBlock2.height);
+    EXPECT_TRUE(stored_block.hash == storedBtcBlock1.hash ||
+                stored_block.hash == storedBtcBlock2.hash);
+  }
+
+  for (cursor->seekToLast(); cursor->isValid(); cursor->prev()) {
+    StoredBtcBlock stored_block = cursor->value();
+    EXPECT_TRUE(stored_block.block == storedBtcBlock1.block ||
+                stored_block.block == storedBtcBlock2.block);
+    EXPECT_TRUE(stored_block.height == storedBtcBlock1.height ||
+                stored_block.height == storedBtcBlock2.height);
+    EXPECT_TRUE(stored_block.hash == storedBtcBlock1.hash ||
+                stored_block.hash == storedBtcBlock2.hash);
+  }
+
+  cursor->seek(storedBtcBlock1.height);
+  EXPECT_TRUE(cursor->isValid());
+  EXPECT_TRUE(cursor->value().height == storedBtcBlock1.height);
+  EXPECT_TRUE(cursor->value().hash == storedBtcBlock1.hash);
+  EXPECT_TRUE(cursor->value().block == storedBtcBlock1.block);
+
+  cursor->seek(storedBtcBlock2.height);
+  EXPECT_TRUE(cursor->isValid());
+  EXPECT_TRUE(cursor->value().height == storedBtcBlock2.height);
+  EXPECT_TRUE(cursor->value().hash == storedBtcBlock2.hash);
+  EXPECT_TRUE(cursor->value().block == storedBtcBlock2.block);
 }

@@ -25,6 +25,9 @@ struct BlockIndex {
   //! height of the entry in the chain
   height_t height = 0;
 
+  //! block hash
+  hash_t hash{};
+
   //! block header
   Block header{};
 
@@ -70,9 +73,16 @@ struct BlockIndex {
     return nullptr;
   }
 
-  void toRaw(WriteStream& stream) {
+  void toRaw(WriteStream& stream) const {
     stream.writeBE<uint32_t>(height);
     header.toRaw(stream);
+  }
+
+  std::string toRaw() const {
+    WriteStream stream;
+    toRaw(stream);
+    return std::string(reinterpret_cast<const char*>(stream.data().data()),
+                       stream.data().size());
   }
 
   static BlockIndex<Block> fromRaw(ReadStream& stream) {
@@ -80,6 +90,11 @@ struct BlockIndex {
     index.height = stream.readBE<uint32_t>();
     index.header = Block::fromRaw(stream);
     return index;
+  }
+
+  static BlockIndex<Block> fromRaw(const std::string& bytes) {
+    ReadStream stream(bytes);
+    return fromRaw(stream);
   }
 
   friend bool operator==(const BlockIndex<Block>& a,
