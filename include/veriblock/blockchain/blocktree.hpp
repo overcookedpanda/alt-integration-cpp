@@ -53,7 +53,7 @@ struct BlockTree {
       return state.addStackFunction("bootstrap()");
     }
 
-    if (block_index_.empty() && !getBlockIndex(block.getHash())) {
+    if (!block_index_.empty() && !getBlockIndex(block.getHash())) {
       return state.Error("block-index-no-genesis");
     }
 
@@ -137,6 +137,7 @@ struct BlockTree {
 
   bool load(ValidationState& state) {
     auto cursor = repo_->newCursor();
+
     // load blocks into memory
     for (cursor->seekToFirst(); cursor->isValid(); cursor->next()) {
       auto value = cursor->value();

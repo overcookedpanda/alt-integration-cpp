@@ -82,7 +82,26 @@ struct IntegrationTestFixture {
         cfHandlePtrs[(int)CF_NAMES::HEIGHT_HASHES_BTC],
         cfHandlePtrs[(int)CF_NAMES::HASH_BLOCK_BTC]);
 
-    blockchain = std::make_shared<BlockTree<block_t>>(repo);
+struct IntegrationTestFixture {
+  using params_t = BtcChainParams;
+  using block_t = BtcBlock;
+  using index_t = typename BlockTree<block_t, params_t>::index_t;
+  using height_t = typename BlockTree<block_t, params_t>::height_t;
+
+  using rocks_repo = BlockRepositoryRocks<index_t>;
+  using inmem_repo = BlockRepositoryInmem<index_t>;
+
+  std::shared_ptr<BlockRepository<index_t>> repo;
+  std::shared_ptr<BlockTree<block_t, params_t>> blockchain;
+  std::shared_ptr<params_t> chainparam;
+  ValidationState state;
+
+  IntegrationTestFixture() {
+    repo = getRepo<rocks_repo>();
+
+    chainparam = std::make_shared<BtcChainParamsMain>();
+    blockchain =
+        std::make_shared<BlockTree<block_t, BtcChainParams>>(repo, chainparam);
   }
 };
 
