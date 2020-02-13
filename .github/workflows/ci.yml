@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 1
 
       - name: cmake
-        run: cmake . -Bbuild -A x64
+        run: cmake . -Bbuild -A x86
       - name: build
         run: cmake --build build --parallel 2
       - name: test
