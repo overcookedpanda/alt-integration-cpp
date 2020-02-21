@@ -14,6 +14,22 @@
 
 namespace VeriBlock {
 
+template <typename Block, typename ChainParams>
+struct BlockTree;
+
+template <typename Block, typename ChainParams>
+struct BlockTreeTemp {
+  using block_t = Block;
+  using index_t = BlockIndex<block_t>;
+  using prev_block_hash_t = decltype(Block::previousBlock);
+
+ private:
+  std::unordered_map<prev_block_hash_t, std::unique_ptr<index_t>> block_index_;
+
+  const std::unordered_map<prev_block_hash_t, std::unique_ptr<index_t>>&
+      block_index_final;
+};
+
 /**
  * BlockTree is a tree of blocks with single "bootstrap" block as root.
  * @tparam Block
