@@ -38,7 +38,7 @@ void VbkBlockTree::determineBestChain(Chain<index_t>& currentBest,
 
   if (result < 0) {
     // other chain won!
-    auto *prevTip = currentBest.tip();
+    auto* prevTip = currentBest.tip();
     currentBest.setTip(&indexNew);
     onTipChanged(indexNew, isBootstrap);
     addForkCandidate(prevTip, &indexNew);
