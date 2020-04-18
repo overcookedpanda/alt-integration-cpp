@@ -55,7 +55,7 @@ VbkTx MockMiner::endorseAltBlock(const PublicationData& publicationData) {
   return transaction;
 }
 
-ATV MockMiner::generateATV(const VbkTx& transaction,
+ContextualATV MockMiner::generateATV(const VbkTx& transaction,
                            const VbkBlock::hash_t& lastKnownVbkBlockHash,
                            ValidationState& state) {
   // build merkle tree
@@ -70,7 +70,7 @@ ATV MockMiner::generateATV(const VbkTx& transaction,
   VbkBlock containingBlock = vbk_miner.createNextBlock(
       *tip, mtree.getMerkleRoot().trim<VBK_MERKLE_ROOT_HASH_SIZE>());
 
-  ATV atv;
+  ContextualATV atv;
   atv.transaction = transaction;
   atv.merklePath.treeIndex = treeIndex;
   atv.merklePath.index = 0;
@@ -256,14 +256,14 @@ VbkBlock MockMiner::applyVTBs(const BlockIndex<VbkBlock>& tip,
       tip, mtree.getMerkleRoot().trim<VBK_MERKLE_ROOT_HASH_SIZE>());
 
   // map VbkPopTx -> VTB
-  std::vector<VTB> vtbs;
+  std::vector<ContextualVTB> vtbs;
   vtbs.reserve(txes.size());
   int32_t index = 0;
   std::transform(txes.begin(),
                  txes.end(),
                  std::back_inserter(vtbs),
-                 [&](const VbkPopTx& tx) -> VTB {
-                   VTB vtb;
+                 [&](const VbkPopTx& tx) -> ContextualVTB {
+                   ContextualVTB vtb;
                    vtb.transaction = tx;
                    vtb.merklePath.treeIndex = treeIndex;
                    vtb.merklePath.index = index;

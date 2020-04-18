@@ -14,10 +14,11 @@ AltPayloads AltPayloads::fromVbkEncoding(ReadStream& stream) {
     p.atv = ATV::fromVbkEncoding(stream);
   }
 
-  p.vtbs =
-      readArrayOf<VTB>(stream, 0, MAX_CONTEXT_COUNT, [](ReadStream& stream) {
-        return VTB::fromVbkEncoding(stream);
-      });
+  // TODO: fix
+//  p.vtbs =
+//      readArrayOf<ContextualVTB>(stream, 0, MAX_CONTEXT_COUNT, [](ReadStream& stream) {
+//        return ContextualVTB::fromVbkEncoding(stream);
+//      });
 
   return p;
 }

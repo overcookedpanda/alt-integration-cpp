@@ -123,7 +123,7 @@ struct Scenario1 : public ::testing::Test, public PopTestFixture {
     return blockCount;
   }
 
-  bool altTreeFindVtb(const VTB& vtb) {
+  bool altTreeFindVtb(const ContextualVTB& vtb) {
     auto lastBlock = *altchain.rbegin();
     auto* index = alttree.getBlockIndex(lastBlock.getHash());
     EXPECT_NE(index, nullptr);

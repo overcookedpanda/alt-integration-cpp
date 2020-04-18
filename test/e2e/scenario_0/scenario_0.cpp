@@ -51,8 +51,8 @@ struct Scenario0 : public ::testing::Test {
   std::shared_ptr<Config> config;
   std::shared_ptr<AltTree> alt;
 
-  ATV atv;
-  std::vector<VTB> vtbs;
+  ContextualATV atv;
+  std::vector<ContextualVTB> vtbs;
 
   BtcBlock endorsedBlock = BtcBlock::fromHex(
       "00000020d9f80b499e1b51117a231981efbdb1b7237034a142526977614e4ccf06000000"
@@ -76,8 +76,8 @@ struct Scenario0 : public ::testing::Test {
     auto t = Altintegration::create(*config);
     alt = std::make_shared<AltTree>(std::move(t));
 
-    atv = parse<ATV>(generated::atv, fromHex<ATV>)[0];
-    vtbs = parse<VTB>(generated::vtbs, fromHex<VTB>);
+    atv = parse<ContextualATV>(generated::atv, fromHex<ContextualATV>)[0];
+    vtbs = parse<ContextualVTB>(generated::vtbs, fromHex<ContextualVTB>);
   }
 };
 

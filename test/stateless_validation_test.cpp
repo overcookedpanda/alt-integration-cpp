@@ -95,7 +95,7 @@ const static VbkTx validVbkTx = {
     "30440220398B74708DC8F8AEE68FCE0C47B8959E6FCE6354665DA3ED87A83F708E62AA6B02202E6C00C00487763C55E92C7B8E1DD538B7375D8DF2B2117E75ACBB9DB7DEB3C7"_unhex,
     "3056301006072A8648CE3D020106052B8104000A03420004DE4EE8300C3CD99E913536CF53C4ADD179F048F8FE90E5ADF3ED19668DD1DBF6C2D8E692B1D36EAC7187950620A28838DA60A8C9DD60190C14C59B82CB90319E"_unhex};
 
-static const ATV validATV = {
+static const ContextualATV validATV = {
     validVbkTx,
     {1,
      0,
@@ -124,7 +124,7 @@ static const ATV validATV = {
          "000212BB0002304FB9683DAFC9396A7F36492BB743C05C2619919657462191847838E"
          "067A87CF5F304B4E102B104320C5CBA33B85DFB5C500405F5E15A2670DE")}};
 
-static const VTB validVTB = {
+static const ContextualVTB validVTB = {
     validPopTx,
     {0,
      13,
@@ -191,7 +191,7 @@ TEST_F(StatelessValidationTest, ATV_valid) {
 
 TEST_F(StatelessValidationTest,
        ATV_checkMerklePath_different_transaction_invalid) {
-  ATV atv = validATV;
+  ContextualATV atv = validATV;
   atv.merklePath.subject = uint256(
       "5B977EA09A554AD56957F662284044E7D37450DDADF7DB3647712F5969399787"_unhex);
 
@@ -203,7 +203,7 @@ TEST_F(StatelessValidationTest,
 
 TEST_F(StatelessValidationTest,
        ATV_checkMerklePath_merkleRoot_dont_match_ivalid) {
-  ATV atv = validATV;
+  ContextualATV atv = validATV;
   atv.containingBlock.merkleRoot =
       uint128("0356EB39B851682679F9A0131A4E4A5F"_unhex);
 
@@ -214,7 +214,7 @@ TEST_F(StatelessValidationTest,
 }
 
 TEST_F(StatelessValidationTest, ATV_checkVeriBlockBlocks_blocks_not_contigous) {
-  ATV atv = validATV;
+  ContextualATV atv = validATV;
   atv.context.erase(atv.context.begin() + 1);
   ASSERT_FALSE(checkVbkBlocks(atv.context, state, vbk));
 }
@@ -225,7 +225,7 @@ TEST_F(StatelessValidationTest, VTB_valid) {
 
 TEST_F(StatelessValidationTest,
        VTB_checkMerklePath_different_transaction_invalid) {
-  VTB vtb = validVTB;
+  ContextualVTB vtb = validVTB;
   vtb.merklePath.subject = uint256(
       "3A014E88ED7AB65CDFAA85DAEAB07EEA6CBA5E147F736EDD8D02C2F9DDF0DEC6"_unhex);
 
@@ -237,7 +237,7 @@ TEST_F(StatelessValidationTest,
 
 TEST_F(StatelessValidationTest,
        VTB_checkMerklePath_merkleRoot_dont_match_ivalid) {
-  VTB vtb = validVTB;
+  ContextualVTB vtb = validVTB;
   vtb.containingBlock.merkleRoot =
       uint128("0356EB39B851682679F9A0131A4E4A5F"_unhex);
   ASSERT_FALSE(checkMerklePath(vtb.merklePath,
@@ -247,7 +247,7 @@ TEST_F(StatelessValidationTest,
 }
 
 TEST_F(StatelessValidationTest, VTB_checkVeriBlockBlocks_blocks_not_contigous) {
-  VTB vtb = validVTB;
+  ContextualVTB vtb = validVTB;
   vtb.context.erase(vtb.context.begin() + 1);
   ASSERT_FALSE(checkVbkBlocks(vtb.context, state, vbk));
 }

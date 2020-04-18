@@ -5,16 +5,16 @@
 
 namespace altintegration {
 
-struct VTB;
+struct ContextualVTB;
 struct AltPayloads;
 
 // endorsement of VBK blocks in BTC
-using BtcEndorsement = Endorsement<uint192, uint256, VTB, int32_t>;
+using BtcEndorsement = Endorsement<uint192, uint256, ContextualVTB, int32_t>;
 
 template <>
-BtcEndorsement BtcEndorsement ::fromContainer(const VTB& c);
+BtcEndorsement BtcEndorsement ::fromContainer(const ContextualVTB& c);
 template <>
-BtcEndorsement::id_t BtcEndorsement::getId(const VTB& c);
+BtcEndorsement::id_t BtcEndorsement::getId(const ContextualVTB& c);
 
 // endorsement of ALT blocks in VBK
 using VbkEndorsement =

@@ -5,7 +5,7 @@
 namespace altintegration {
 
 template <>
-BtcEndorsement BtcEndorsement::fromContainer(const VTB& c) {
+BtcEndorsement BtcEndorsement::fromContainer(const ContextualVTB& c) {
   BtcEndorsement e;
   e.id = BtcEndorsement::getId(c);
   e.blockOfProof = c.transaction.blockOfProof.getHash();
@@ -29,7 +29,7 @@ VbkEndorsement VbkEndorsement::fromContainer(const AltPayloads& c) {
 }
 
 template <>
-BtcEndorsement::id_t BtcEndorsement::getId(const VTB& c) {
+BtcEndorsement::id_t BtcEndorsement::getId(const ContextualVTB& c) {
   WriteStream stream;
   c.transaction.bitcoinTransaction.toVbkEncoding(stream);
   c.transaction.blockOfProof.toRaw(stream);

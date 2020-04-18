@@ -25,9 +25,9 @@ class StateChange {
 
   void clear() { payloadsAltBatch->clear(); }
 
-  void saveVbkPayloads(const VTB& payloads) { payloadsVbkBatch->put(payloads); }
+  void saveVbkPayloads(const ContextualVTB& payloads) { payloadsVbkBatch->put(payloads); }
 
-  void removeVbkPayloads(const VTB& payloads) {
+  void removeVbkPayloads(const ContextualVTB& payloads) {
     payloadsVbkBatch->removeByHash(payloads.containingBlock.getHash());
   }
 

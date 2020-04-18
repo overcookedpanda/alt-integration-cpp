@@ -178,8 +178,7 @@ bool AltTree::addPayloads(const AltBlock& containingBlock,
   }
 
   // allocate a new element in the stack
-  context_t ctx;
-  index->containingContext.push_back(ctx);
+  index->containingContext.emplace_back();
 
   if (!cmp_.addPayloads(*index, payloads, state)) {
     index->containingContext.pop_back();
@@ -419,7 +418,7 @@ void removeContextFromBlockIndex(BlockIndex<AltBlock>& index,
 
   auto& vtbs = index.containingContext.back().vtbs;
   auto vtbs_end = vtbs.end();
-  auto removeVTB = [&](const VTB& vtb) {
+  auto removeVTB = [&](const ContextualVTB& vtb) {
     vtbs_end = std::remove(vtbs.begin(), vtbs_end, vtb);
   };
 

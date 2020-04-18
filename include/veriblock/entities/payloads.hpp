@@ -9,15 +9,19 @@
 
 namespace altintegration {
 
-struct AltPayloads {
-  using id_t = uint256;
-
-  AltBlock endorsed;
-  AltBlock containingBlock;
-  uint256 containingTx;
+struct AltPopPayloads {
   bool hasAtv{false};
   ATV atv{};
   std::vector<VTB> vtbs{};
+  std::vector<VbkBlock> context;
+};
+
+struct AltPayloads : public AltPopPayloads {
+  using id_t = uint256;
+
+  AltBlock endorsed{};
+  AltBlock containingBlock{};
+  uint256 containingTx{};
 
   /**
    * Read VBK data from the stream and convert it to Payloads

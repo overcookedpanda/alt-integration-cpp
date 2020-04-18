@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "veriblock/consts.hpp"
+#include "veriblock/entities/contextual.hpp"
 #include "veriblock/entities/vbk_merkle_path.hpp"
 #include "veriblock/entities/vbkblock.hpp"
 #include "veriblock/entities/vbktx.hpp"
@@ -17,10 +18,11 @@ struct ATV {
   VbkTx transaction{};
   VbkMerklePath merklePath{};
   VbkBlock containingBlock{};
-  std::vector<VbkBlock> context{};
 
   //! (memory only) indicates whether we already did 'checkATV' on this ATV
   mutable bool checked{false};
+
+  uint256 getId() const;
 
   /**
    * Read VBK data from the stream and convert it to ATV
@@ -51,11 +53,11 @@ struct ATV {
   static ATV fromHex(const std::string& h);
 
   friend bool operator==(const ATV& a, const ATV& b) {
-    // clang-format off
-    return a.toVbkEncoding() == b.toVbkEncoding();
-    // clang-format on
+    return a.getId() == b.getId();
   }
 };
+
+using ContextualATV = Contextual<ATV>;
 
 }  // namespace altintegration
 

@@ -77,7 +77,7 @@ struct PopTestFixture {
         popminer.getBtcParams().getGenesisBlock().getHash());
   }
 
-  void fillVTBContext(VTB& vtb,
+  void fillVTBContext(ContextualVTB& vtb,
                       const VbkBlock::hash_t& lastKnownVbkBlockHash,
                       VbkBlockTree& tree) {
     auto* tip = tree.getBlockIndex(vtb.containingBlock.getHash())->pprev;

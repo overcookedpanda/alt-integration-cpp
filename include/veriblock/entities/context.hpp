@@ -20,7 +20,6 @@ struct VbkContext {
 };
 
 struct AltContext {
-  // corresponds to the ATV
   std::vector<VbkBlock> vbk;
 
   std::vector<VTB> vtbs;

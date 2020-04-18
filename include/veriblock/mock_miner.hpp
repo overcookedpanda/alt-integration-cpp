@@ -45,11 +45,11 @@ class MockMiner {
  public:
   std::vector<BtcTx> btcmempool;
   std::vector<VbkPopTx> vbkmempool;
-  std::unordered_map<VbkBlock::hash_t, std::vector<VTB>> vbkPayloads;
+  std::unordered_map<VbkBlock::hash_t, std::vector<ContextualVTB>> vbkPayloads;
   std::unordered_map<AltBlock::hash_t, std::vector<AltPayloads>> altPayloads;
 
   VbkTx endorseAltBlock(const PublicationData& publicationData);
-  ATV generateATV(const VbkTx& transaction,
+  ContextualATV generateATV(const VbkTx& transaction,
                   const VbkBlock::hash_t& lastKnownVbkBlockHash,
                   ValidationState& state);
 

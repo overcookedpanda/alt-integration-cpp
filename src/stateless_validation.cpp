@@ -291,7 +291,7 @@ bool checkSignature(const VbkPopTx& tx, ValidationState& state) {
   return true;
 }
 
-bool checkATV(const ATV& atv,
+bool checkATV(const ContextualATV& atv,
               ValidationState& state,
               const AltChainParams& altp,
               const VbkChainParams& vbkp) {
@@ -329,7 +329,7 @@ bool checkATV(const ATV& atv,
   return true;
 }
 
-bool checkVTB(const VTB& vtb,
+bool checkVTB(const ContextualVTB& vtb,
               ValidationState& state,
               const VbkChainParams& vbk,
               const BtcChainParams& btc) {

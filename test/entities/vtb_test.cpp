@@ -159,13 +159,13 @@ static const VbkBlock vtbVbkBlock{4976,
                                   117576138,
                                   -266584319};
 
-static const VTB defaultVtb{
+static const ContextualVTB defaultVtb{
     defaultTx, vtbProofPath, vtbVbkBlock, std::vector<VbkBlock>{}};
 
 TEST(VTB, Deserialize) {
   const auto vtbBytes = ParseHex(defaultVtbEncoded);
   auto stream = ReadStream(vtbBytes);
-  auto decoded = VTB::fromVbkEncoding(stream);
+  auto decoded = ContextualVTB::fromVbkEncoding(stream);
 
   EXPECT_EQ(decoded.transaction.address,
             Address::fromString("VE6MJFzmGdYdrxC8o6UCovVv7BdhdX"));
@@ -182,7 +182,7 @@ TEST(VTB, Serialize) {
 TEST(VTB, RoundTrip) {
   auto vtbBytes = ParseHex(defaultVtbEncoded);
   auto stream = ReadStream(vtbBytes);
-  auto decoded = VTB::fromVbkEncoding(stream);
+  auto decoded = ContextualVTB::fromVbkEncoding(stream);
   EXPECT_EQ(decoded.transaction.address,
             Address::fromString("VE6MJFzmGdYdrxC8o6UCovVv7BdhdX"));
 

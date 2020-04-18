@@ -2,8 +2,8 @@
 
 using namespace altintegration;
 
-VTB VTB::fromVbkEncoding(ReadStream& stream) {
-  VTB vtb{};
+ContextualVTB ContextualVTB::fromVbkEncoding(ReadStream& stream) {
+  ContextualVTB vtb{};
   vtb.transaction = VbkPopTx::fromVbkEncoding(stream);
   vtb.merklePath = VbkMerklePath::fromVbkEncoding(stream);
   vtb.containingBlock = VbkBlock::fromVbkEncoding(stream);
@@ -15,17 +15,17 @@ VTB VTB::fromVbkEncoding(ReadStream& stream) {
   return vtb;
 }
 
-VTB VTB::fromVbkEncoding(Slice<const uint8_t> bytes) {
+ContextualVTB ContextualVTB::fromVbkEncoding(Slice<const uint8_t> bytes) {
   ReadStream stream(bytes);
   return fromVbkEncoding(stream);
 }
 
-VTB VTB::fromVbkEncoding(const std::string& bytes) {
+ContextualVTB ContextualVTB::fromVbkEncoding(const std::string& bytes) {
   ReadStream stream(bytes);
   return fromVbkEncoding(stream);
 }
 
-void VTB::toVbkEncoding(WriteStream& stream) const {
+void ContextualVTB::toVbkEncoding(WriteStream& stream) const {
   WriteStream txStream;
   transaction.toVbkEncoding(stream);
   merklePath.toVbkEncoding(stream);
@@ -36,24 +36,19 @@ void VTB::toVbkEncoding(WriteStream& stream) const {
   }
 }
 
-std::vector<uint8_t> VTB::toVbkEncoding() const {
+std::vector<uint8_t> ContextualVTB::toVbkEncoding() const {
   WriteStream stream;
   toVbkEncoding(stream);
   return stream.data();
 }
 
-VTB::id_t VTB::getId() const {
-  auto rawBytes = toVbkEncoding();
-  return sha256(rawBytes);
-}
+VbkBlock ContextualVTB::getContainingBlock() const { return this->containingBlock; }
 
-VbkBlock VTB::getContainingBlock() const { return this->containingBlock; }
-
-VbkBlock VTB::getEndorsedBlock() const {
+VbkBlock ContextualVTB::getEndorsedBlock() const {
   return this->transaction.publishedBlock;
 }
 
-VTB VTB::fromHex(const std::string& hex) {
+ContextualVTB ContextualVTB::fromHex(const std::string& hex) {
   auto data = ParseHex(hex);
   return fromVbkEncoding(data);
 }

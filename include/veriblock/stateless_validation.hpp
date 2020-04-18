@@ -71,12 +71,12 @@ bool checkBlock(const VbkBlock& block,
                 ValidationState& state,
                 const VbkChainParams& params);
 
-bool checkATV(const ATV& atv,
+bool checkATV(const ContextualATV& atv,
               ValidationState& state,
               const AltChainParams& alt,
               const VbkChainParams& vbk);
 
-bool checkVTB(const VTB& vtb,
+bool checkVTB(const ContextualVTB& vtb,
               ValidationState& state,
               const VbkChainParams& vbk,
               const BtcChainParams& btc);

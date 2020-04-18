@@ -50,13 +50,13 @@ static const VbkBlock defaultVbkBlock{5000,
                                       16842752,
                                       1};
 
-static const ATV defaultAtv{
+static const ContextualATV defaultAtv{
     defaultTx, defaultPath, defaultVbkBlock, std::vector<VbkBlock>{}};
 
 TEST(ATV, Deserialize) {
   const auto atvBytes = ParseHex(defaultAtvEncoded);
   auto stream = ReadStream(atvBytes);
-  auto decoded = ATV::fromVbkEncoding(stream);
+  auto decoded = ContextualATV::fromVbkEncoding(stream);
 
   EXPECT_EQ(decoded.transaction.sourceAddress,
             Address::fromString("V5Ujv72h4jEBcKnALGc4fKqs6CDAPX"));
@@ -73,7 +73,7 @@ TEST(ATV, Serialize) {
 TEST(ATV, RoundTrip) {
   auto atvBytes = ParseHex(defaultAtvEncoded);
   auto stream = ReadStream(atvBytes);
-  auto decoded = ATV::fromVbkEncoding(stream);
+  auto decoded = ContextualATV::fromVbkEncoding(stream);
   EXPECT_EQ(decoded.transaction.sourceAddress,
             Address::fromString("V5Ujv72h4jEBcKnALGc4fKqs6CDAPX"));
 
