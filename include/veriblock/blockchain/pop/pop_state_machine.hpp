@@ -9,6 +9,7 @@
 #include <functional>
 #include <veriblock/blockchain/chain.hpp>
 #include <veriblock/storage/payloads_repository.hpp>
+#include <veriblock/blockchain/command_history.hpp>
 
 namespace altintegration {
 
@@ -39,6 +40,25 @@ struct PopStateMachine {
   //! @invariant: atomic. Does not throw under normal conditions.
   void unapplyContext(const index_t&);
 
+  bool applyBlock(const index_t& index, ValidationState& state) {
+    bool isDuplicate = false;
+    for (const auto& cmd : index.commands) {
+      if (!cmd->Execute(state, &isDuplicate)) {
+        // it is either duplicate command or this command is invalidated after we got new info
+
+        // TODO: Handle
+
+      }
+    }
+    return true;
+  }
+
+  void unapplyBlock(const index_t& index) {
+    auto& v = index.commands;
+    std::for_each(
+        v.rbegin(), v.rend(), [](const CommandPtr& cmd) { cmd->UnExecute(); });
+  }
+
   void unapply(ProtectedIndex& to) {
     if (&to == index_) {
       // already at this state
@@ -50,7 +70,7 @@ struct PopStateMachine {
     auto* current = chain.tip();
     while (current && current != forkPoint) {
       // unapply payloads
-      unapplyContext(*current);
+      unapplyBlock(*current);
       current = current->pprev;
       index_ = current;
     }
@@ -80,7 +100,7 @@ struct PopStateMachine {
         return false;
       }
 
-      if (!applyContext(*current, state)) {
+      if (!applyblock(*current, state)) {
         return state.Invalid("pop-state-apply-context");
       }
 

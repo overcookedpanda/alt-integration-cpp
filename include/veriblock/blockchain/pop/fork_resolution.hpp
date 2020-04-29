@@ -565,7 +565,11 @@ struct PopAwareForkResolutionComparator {
   }
 
   bool operator==(const PopAwareForkResolutionComparator& o) const {
-    return index_ == o.index_ && tree_ == o.tree_;
+    if ((index_ == nullptr || o.index_ == nullptr) && index_ != o.index_) {
+      return false;
+    }
+
+    return tree_ == o.tree_;
   }
 
   std::string toPrettyString(size_t level = 0) const {

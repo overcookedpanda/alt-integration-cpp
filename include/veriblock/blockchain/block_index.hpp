@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "veriblock/blockchain/command.hpp"
 #include "veriblock/arith_uint256.hpp"
 #include "veriblock/entities/endorsements.hpp"
 #include "veriblock/entities/payloads.hpp"
@@ -69,6 +70,9 @@ struct BlockIndex {
 
   //! list of containing context blocks that **change** current state
   context_t containingContext{};
+
+  //! list of changes introduced in this block
+  std::vector<CommandPtr> commands{};
 
   //! height of the entry in the chain
   height_t height = 0;
