@@ -402,7 +402,7 @@ struct PopAwareForkResolutionComparator {
                       protectedParams_->getKeystoneInterval()));
     // we ALWAYS compare currently applied chain (chainA) and other chain
     // (chainB)
-    assert(chainA.tip() == currentActive);
+    assert(chainA.tip() == &currentActive);
 
     ValidationState state;
     sm_t sm(tree_, *protectedParams_, chainA.first()->height);
@@ -445,7 +445,7 @@ struct PopAwareForkResolutionComparator {
     bool res = false;
     if (result >= 0) {
       // chain A remains best, unapply chain B
-      sm.unapply(*chainB.tip(), *chainB.first(), state);
+      sm.unapply(*chainB.tip(), *chainB.first());
     } else {
       // chain B is better, unapply chain A
       sm.unapply(*chainA.tip(), *chainA.first());

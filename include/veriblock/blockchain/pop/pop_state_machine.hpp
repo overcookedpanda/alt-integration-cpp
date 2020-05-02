@@ -61,7 +61,7 @@ struct PopStateMachine {
   }
 
   // applies commands in range (from; to].
-  bool apply(ProtectedIndex& from, ProtectedIndex& to, ValidationState& state) {
+  std::pair<bool, ProtectedIndex*> apply(ProtectedIndex& from, ProtectedIndex& to, ValidationState& state) {
     assert(from.height < to.height);
     // exclude 'from' by adding 1
     Chain<ProtectedIndex> chain(from.height + 1, &to);
@@ -69,17 +69,15 @@ struct PopStateMachine {
     assert(chain.first()->pprev == &from);
 
     for (auto it = chain.begin(), end = chain.end(); it != end; ++it) {
-      if (!it->isValid()) {
-        unapply(*it, from);
-        return false;
+      auto* index = *it;
+      if (!index->isValid()) {
+        unapply(*index, from);
+        return {false, nullptr};
       }
 
-      if (!applyBlock(*it, state)) {
-        unapply(*it, from);
-
-        // we tried to apply a block, but found an invalid command.
-        tree().invalidateSubtree(*it, BLOCK_FAILED_POP);
-        return false;
+      if (!applyBlock(*index, state)) {
+        unapply(*index, from);
+        return {false, index};
       }
     }
 

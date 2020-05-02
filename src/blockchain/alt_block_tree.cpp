@@ -43,10 +43,6 @@ bool AltTree::bootstrap(ValidationState& state) {
     return state.Error("block-index-no-genesis");
   }
 
-  if (!cmp_.setState(*index, state)) {
-    return state.Invalid("vbk-set-state");
-  }
-
   tryAddTip(index);
 
   return true;
@@ -89,13 +85,13 @@ void AltTree::invalidateBlock(const hash_t& blockHash,
 void AltTree::invalidateBlock(index_t& blockIndex, enum BlockStatus reason) {
   ValidationState state;
 
-  bool isInSameChain =
-      cmp_.getIndex()->getAncestor(blockIndex.height) == &blockIndex;
-  if (isInSameChain) {
-    bool ret = cmp_.setState(*blockIndex.pprev, state);
-    (void)ret;
-    assert(ret);
-  }
+//  bool isInSameChain =
+//      cmp_.getIndex()->getAncestor(blockIndex.height) == &blockIndex;
+//  if (isInSameChain) {
+//    bool ret = cmp_.setState(*blockIndex.pprev, state);
+//    (void)ret;
+//    assert(ret);
+//  }
 
   base::invalidateBlock(blockIndex, reason, [&](index_t& index) -> bool {
     removeAllContainingEndorsements(index);
@@ -123,22 +119,8 @@ bool AltTree::addPayloads(const AltBlock& containingBlock,
   return ret;
 }
 
-void AltTree::removePayloads(const AltBlock& containingBlock,
-                             const std::vector<payloads_t>& payloads) {
-  auto* index = getBlockIndex(containingBlock.getHash());
-  if (index != nullptr) {
-    cmp_.removePayloads(*index, payloads);
-  }
-}
 
-bool AltTree::setState(const AltBlock::hash_t& to, ValidationState& state) {
-  auto* index = getBlockIndex(to);
-  if (index == nullptr) {
-    return state.Error("Can not switch state to an unknown block");
-  }
 
-  return cmp_.setState(*index, state);
-}
 
 std::map<std::vector<uint8_t>, int64_t> AltTree::getPopPayout(
     const AltBlock::hash_t& tip, ValidationState& state) {
@@ -204,7 +186,8 @@ int AltTree::compareTwoBranches(AltTree::index_t* chain1,
   Chain<index_t> subchain1(forkPoint->height, chainA.tip());
   Chain<index_t> subchain2(forkPoint->height, chainB.tip());
 
-  return cmp_.comparePopScore(subchain1, subchain2);
+//  return cmp_.comparePopScore(subchain1, subchain2);
+  return 0;
 }
 
 int AltTree::compareTwoBranches(const hash_t& chain1, const hash_t& chain2) {
@@ -213,37 +196,36 @@ int AltTree::compareTwoBranches(const hash_t& chain1, const hash_t& chain2) {
   return compareTwoBranches(i1, i2);
 }
 
-bool AltTree::addPayloads(AltTree::PopForkComparator& cmp,
-                          const AltBlock& containingBlock,
-                          const std::vector<payloads_t>& payloads,
-                          ValidationState& state) {
-  auto hash = containingBlock.getHash();
-  auto* index = getBlockIndex(hash);
-  if (index == nullptr) {
-    return state.Invalid("no-alt-block",
-                         "addPayloads can be executed only on existing "
-                         "blocks, can not find block " +
-                             HexStr(hash));
-  }
-
-  if (!cmp.addPayloads(*index, payloads, state)) {
-    return state.Invalid("bad-alt-payloads-stateful");
-  }
-
-  return true;
-}
+//bool AltTree::addPayloads(AltTree::PopForkComparator& cmp,
+//                          const AltBlock& containingBlock,
+//                          const std::vector<payloads_t>& payloads,
+//                          ValidationState& state) {
+//  auto hash = containingBlock.getHash();
+//  auto* index = getBlockIndex(hash);
+//  if (index == nullptr) {
+//    return state.Invalid("no-alt-block",
+//                         "addPayloads can be executed only on existing "
+//                         "blocks, can not find block " +
+//                             HexStr(hash));
+//  }
+//
+//  // TODO
+//
+//  return true;
+//}
 void AltTree::removeSubtree(index_t& toRemove) {
-  bool ret = false;
-  ValidationState state;
-  auto isInState = cmp_.getIndex()->getAncestor(toRemove.height) == &toRemove;
-  if (isInState) {
-    ret = cmp_.setState(*toRemove.pprev, state);
-    assert(ret);
-  }
-
-  base::removeSubtree(toRemove, [](index_t&) {
-    /* do nothing */
-  });
+  (void) toRemove;
+//  bool ret = false;
+//  ValidationState state;
+//  auto isInState = cmp_.getIndex()->getAncestor(toRemove.height) == &toRemove;
+//  if (isInState) {
+//    ret = cmp_.setState(*toRemove.pprev, state);
+//    assert(ret);
+//  }
+//
+//  base::removeSubtree(toRemove, [](index_t&) {
+//    /* do nothing */
+//  });
 }
 void AltTree::removeSubtree(const hash_t& hash) {
   auto* index = base::getBlockIndex(hash);

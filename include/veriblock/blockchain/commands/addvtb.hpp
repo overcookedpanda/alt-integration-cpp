@@ -32,6 +32,8 @@ struct AddVTB : public Command {
     // add commands to VBK containing block
     auto& c = index->commands;
     c.insert(c.end(), containingCmds_.begin(), containingCmds_.end());
+
+    return true;
   }
   void UnExecute() override {
     auto* index = tree_->vbk().getBlockIndex(vbkContaining_);
@@ -56,7 +58,17 @@ struct AddVTB : public Command {
   };
 
   //! debug method. returns a string describing this command
-  std::string toPrettyString(size_t level = 0) const override { return ""; };
+  std::string toPrettyString(size_t level = 0) const override {
+    std::ostringstream ss;
+    std::string pad(level, ' ');
+    ss << pad << "AddVTB{commands=" << containingCmds_.size()
+       << ", vbkContaining=" << vbkContaining_.toHex() << "\n";
+    for (const auto& cmd : containingCmds_) {
+      ss << cmd->toPrettyString(level + 2);
+    }
+    ss << pad << "}";
+    return ss.str();
+  };
 
  private:
   AltTree* tree_;

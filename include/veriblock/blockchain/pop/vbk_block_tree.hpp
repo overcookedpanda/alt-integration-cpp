@@ -38,8 +38,8 @@ struct VbkBlockTree : public BlockTree<VbkBlock, VbkChainParams> {
   PopForkComparator& getComparator() { return cmp_; }
   const PopForkComparator& getComparator() const { return cmp_; }
 
-  void removeSubtree(const hash_t& h);
-  void removeSubtree(index_t&);
+//  void removeSubtree(const hash_t& h);
+//  void removeSubtree(index_t&);
   void invalidateSubtree(const hash_t& h);
   void invalidateSubtree(index_t&, enum BlockStatus reason = BLOCK_FAILED_POP);
 

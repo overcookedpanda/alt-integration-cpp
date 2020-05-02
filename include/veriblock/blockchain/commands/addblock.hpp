@@ -69,21 +69,15 @@ inline std::string AddVbkBlock::toPrettyString(size_t level) const {
 
 template <typename BlockTree>
 void addBlock(BlockTree& tree,
-              std::unordered_set<typename BlockTree::hash_t>& unique,
               const typename BlockTree::block_t& block,
               std::vector<CommandPtr>& commands) {
   using block_t = typename BlockTree::block_t;
   using params_t = typename BlockTree::params_t;
-  auto hash = block.getHash();
-  if (unique.insert(hash).second) {
-    // we don't know this block, create command
-    auto blockPtr = std::make_shared<block_t>(block);
-    auto cmd = std::make_shared<AddBlock<block_t, params_t>>(
-        tree, std::move(blockPtr));
-    commands.push_back(std::move(cmd));
-  }
-
-  // we already added this block, do nothing
+  // we don't know this block, create command
+  auto blockPtr = std::make_shared<block_t>(block);
+  auto cmd =
+      std::make_shared<AddBlock<block_t, params_t>>(tree, std::move(blockPtr));
+  commands.push_back(std::move(cmd));
 };
 
 }  // namespace altintegration

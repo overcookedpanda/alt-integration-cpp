@@ -121,45 +121,18 @@ std::string VbkBlockTree::toPrettyString(size_t level) const {
   return ss.str();
 }
 
-void VbkBlockTree::removeSubtree(index_t& toRemove) {
-  ValidationState state;
-  bool ret = false;
-
-  bool isOnActiveChain = activeChain_.contains(&toRemove);
-  if (isOnActiveChain) {
-    activeChain_.setTip(toRemove.pprev);
-  }
-
-  base::removeSubtree(
-      toRemove, [](index_t& next) { removeAllContainingEndorsements(next); });
-
-  if (isOnActiveChain) {
-    // do a fork resolution
-    // find new best chain among remaining forks
-    for (auto it = base::tips_.begin(); it != base::tips_.end();) {
-      index_t* index = *it;
-      if (!index->isValid()) {
-        it = base::tips_.erase(it);
-      } else {
-        determineBestChain(activeChain_, *index);
-        ++it;
-      }
-    }
-  }
-
-  ret = cmp_.setState(*activeChain_.tip(), state);
-  assert(ret);
-  (void)ret;
-}
-
-void VbkBlockTree::removeSubtree(const hash_t& hash) {
-  auto* index = VbkTree::getBlockIndex(hash);
-  if (!index) {
-    return;
-  }
-
-  return removeSubtree(*index);
-}
+//void VbkBlockTree::removeSubtree(index_t& toRemove) {
+//  VbkTree::removeSubtree(toRemove);
+//}
+//
+//void VbkBlockTree::removeSubtree(const hash_t& hash) {
+//  auto* index = VbkTree::getBlockIndex(hash);
+//  if (!index) {
+//    return;
+//  }
+//
+//  return removeSubtree(*index);
+//}
 
 void VbkBlockTree::invalidateSubtree(const hash_t& h) {
   auto* index = VbkTree::getBlockIndex(h);
@@ -180,14 +153,12 @@ void payloadsToCommands<VbkBlockTree>(VbkBlockTree& tree,
                                       const VbkBlock::hash_t& containing,
                                       const VTB& p,
                                       std::vector<CommandPtr>& commands) {
-  std::unordered_set<BtcBlock::hash_t> unique;
-
   // process BTC context blocks
   for (const auto& b : p.transaction.blockOfProofContext) {
-    addBlock(tree.btc(), unique, b, commands);
+    addBlock(tree.btc(), b, commands);
   }
   // process block of proof
-  addBlock(tree.btc(), unique, p.transaction.blockOfProof, commands);
+  addBlock(tree.btc(), p.transaction.blockOfProof, commands);
 
   // add endorsement
   auto e = BtcEndorsement::fromContainerPtr(p);

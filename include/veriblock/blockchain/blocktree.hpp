@@ -116,7 +116,7 @@ struct BlockTree : public BaseBlockTree<Block> {
     if (!index) {
       return;
     }
-    return removeSubtree(*index);
+    return removeSubtree(*index, [] { /* do nothing */ });
   }
 
   void removeSubtree(index_t& blockIndex) {
@@ -125,9 +125,7 @@ struct BlockTree : public BaseBlockTree<Block> {
       activeChain_.setTip(blockIndex.pprev);
     }
 
-    base::removeSubtree(blockIndex, [](index_t&) {
-      /* do nothing */
-    });
+    base::removeSubtree(blockIndex, [] { /* do nothing */ });
 
     if (isOnMainChain) {
       // find new best chain among remaining forks
