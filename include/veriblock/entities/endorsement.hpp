@@ -58,6 +58,10 @@ struct Endorsement {
 
   static type fromContainer(const Container& c);
 
+  static std::shared_ptr<type> fromContainerPtr(const Container& c) {
+    return std::make_shared<type>(fromContainer(c));
+  }
+
   static type::id_t getId(const Container& c);
 
   bool operator==(const type& other) const { return id == other.id; }

@@ -319,16 +319,20 @@ struct BlockTree : public BaseBlockTree<Block> {
       return;
     }
 
-    if (currentBest.tip() == nullptr ||
-        currentBest.tip()->chainWork < indexNew.chainWork) {
+    auto* prev = currentBest.tip();
+    if (prev == nullptr || prev->chainWork < indexNew.chainWork) {
       currentBest.setTip(&indexNew);
-      onTipChanged(indexNew, isBootstrap);
+      onTipChanged(prev, indexNew, isBootstrap);
     }
   }
 
   //! callback, executed every time when tip is changed. Useful for derived
   //! classes.
-  virtual void onTipChanged(index_t&, bool isBootstrap) { (void)isBootstrap; }
+  virtual void onTipChanged(index_t* from, index_t& to, bool isBootstrap) {
+    (void)from;
+    (void)to;
+    (void)isBootstrap;
+  }
 };
 
 }  // namespace altintegration

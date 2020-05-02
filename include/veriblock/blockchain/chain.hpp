@@ -80,6 +80,15 @@ struct Chain {
 
   index_t* first() const { return chain.empty() ? nullptr : chain[0]; }
 
+  typename storage_t::reverse_iterator rbegin() { return chain.rbegin(); }
+  typename storage_t::const_reverse_iterator rbegin() const {
+    return chain.rbegin();
+  }
+  typename storage_t::reverse_iterator rend() { return chain.rend(); }
+  typename storage_t::const_reverse_iterator rend() const {
+    return chain.rend();
+  }
+
   typename storage_t::iterator begin() { return chain.begin(); }
   typename storage_t::const_iterator begin() const { return chain.begin(); }
   typename storage_t::iterator end() { return chain.end(); }

@@ -46,7 +46,11 @@ template <typename BlockIndexT>
 void removeContextFromBlockIndex(BlockIndexT&,
                                  const typename BlockIndexT::payloads_t&);
 
-
+template <typename ProtectedBlockTree>
+void payloadsToCommands(ProtectedBlockTree& tree,
+                        const typename ProtectedBlockTree::hash_t& containing,
+                        const typename ProtectedBlockTree::payloads_t& p,
+                        std::vector<CommandPtr>& commands);
 
 }  // namespace altintegration
 

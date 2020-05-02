@@ -14,19 +14,9 @@
 #include <veriblock/entities/btcblock.hpp>
 #include <veriblock/finalizer.hpp>
 #include <veriblock/state_manager.hpp>
-#include <veriblock/blockchain/commands/commands.hpp>
 #include <veriblock/storage/endorsement_repository.hpp>
 
 namespace altintegration {
-
-template <>
-void addContextToBlockIndex(BlockIndex<VbkBlock>& index,
-                            const typename BlockIndex<VbkBlock>::payloads_t& p,
-                            const BlockTree<BtcBlock, BtcChainParams>& tree);
-
-template <>
-void removeContextFromBlockIndex(BlockIndex<VbkBlock>& index,
-                                 const BlockIndex<VbkBlock>::payloads_t& p);
 
 struct VbkBlockTree : public BlockTree<VbkBlock, VbkChainParams> {
   using VbkTree = BlockTree<VbkBlock, VbkChainParams>;
@@ -50,6 +40,8 @@ struct VbkBlockTree : public BlockTree<VbkBlock, VbkChainParams> {
 
   void removeSubtree(const hash_t& h);
   void removeSubtree(index_t&);
+  void invalidateSubtree(const hash_t& h);
+  void invalidateSubtree(index_t&, enum BlockStatus reason = BLOCK_FAILED_POP);
 
   bool bootstrapWithChain(height_t startHeight,
                           const std::vector<block_t>& chain,
@@ -57,15 +49,10 @@ struct VbkBlockTree : public BlockTree<VbkBlock, VbkChainParams> {
 
   bool bootstrapWithGenesis(ValidationState& state) override;
 
-  bool addPayloads(const block_t& block,
-                   const std::vector<payloads_t>& payloads,
-                   ValidationState& state,
-                   bool atomic = true);
+  void addPayloads(const block_t& block,
+                   const std::vector<payloads_t>& payloads);
 
-  void removePayloads(const block_t& block,
-                      const std::vector<payloads_t>& payloads);
-
-  void removePayloads(index_t* block, const std::vector<payloads_t>& payloads);
+  void onTipChanged(index_t* from, index_t& to, bool isBootstrap) override;
 
   bool operator==(const VbkBlockTree& o) const {
     return cmp_ == o.cmp_ && VbkTree::operator==(o);
@@ -78,21 +65,15 @@ struct VbkBlockTree : public BlockTree<VbkBlock, VbkChainParams> {
                           index_t& indexNew,
                           bool isBootstrap = false) override;
 
-  bool addPayloads(PopForkComparator& cmp,
-                   const block_t& block,
-                   const std::vector<payloads_t>& payloads,
-                   ValidationState& state);
-
   PopForkComparator cmp_;
 };
 
 template <>
-bool VbkBlockTree::PopForkComparator::sm_t::applyContext(
-    const BlockIndex<VbkBlock>& index, ValidationState& state);
-
-template <>
-void VbkBlockTree::PopForkComparator::sm_t::unapplyContext(
-    const BlockIndex<VbkBlock>& index);
+void payloadsToCommands<VbkBlockTree>(
+    VbkBlockTree& tree,
+    const typename VbkBlockTree::hash_t& containing,
+    const typename VbkBlockTree::payloads_t& p,
+    std::vector<CommandPtr>& commands);
 
 }  // namespace altintegration
 

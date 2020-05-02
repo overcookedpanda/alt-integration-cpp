@@ -8,8 +8,8 @@
 
 #include <functional>
 #include <veriblock/blockchain/chain.hpp>
-#include <veriblock/storage/payloads_repository.hpp>
 #include <veriblock/blockchain/command_history.hpp>
+#include <veriblock/storage/payloads_repository.hpp>
 
 namespace altintegration {
 
@@ -26,28 +26,16 @@ struct PopStateMachine {
   using endorsement_t = typename ProtectedIndex::endorsement_t;
 
   PopStateMachine(ProtectingBlockTree& tree,
-                  ProtectedIndex* index,
                   const ProtectedChainParams& protectedParams,
                   height_t startHeight = 0)
-      : index_(index),
-        tree_(tree),
+      : tree_(tree),
         protectedParams_(&protectedParams),
         startHeight_(startHeight) {}
 
-  //! @invariant: atomic. Either all 'payloads' added or not at all.
-  bool applyContext(const index_t&, ValidationState&);
-
-  //! @invariant: atomic. Does not throw under normal conditions.
-  void unapplyContext(const index_t&);
-
   bool applyBlock(const index_t& index, ValidationState& state) {
-    bool isDuplicate = false;
     for (const auto& cmd : index.commands) {
-      if (!cmd->Execute(state, &isDuplicate)) {
-        // it is either duplicate command or this command is invalidated after we got new info
-
-        // TODO: Handle
-
+      if (!cmd->Execute(state)) {
+        return false;
       }
     }
     return true;
@@ -59,86 +47,53 @@ struct PopStateMachine {
         v.rbegin(), v.rend(), [](const CommandPtr& cmd) { cmd->UnExecute(); });
   }
 
-  void unapply(ProtectedIndex& to) {
-    if (&to == index_) {
-      // already at this state
-      return;
-    }
+  // unapplies commands in range [from; to)
+  void unapply(ProtectedIndex& from, ProtectedIndex& to) {
+    assert(from.height > to.height);
+    // exclude 'to' by adding 1
+    Chain<ProtectedIndex> chain(to.height + 1, from);
+    assert(chain.first());
+    assert(chain.first()->pprev == &to);
 
-    Chain<ProtectedIndex> chain(startHeight_, index_);
-    auto* forkPoint = chain.findFork(&to);
-    auto* current = chain.tip();
-    while (current && current != forkPoint) {
-      // unapply payloads
+    std::for_each(chain.rbegin(), chain.rend(), [&](ProtectedIndex& current) {
       unapplyBlock(*current);
-      current = current->pprev;
-      index_ = current;
-    }
-
-    assert(index_);
-    assert(index_ == forkPoint);
+    });
   }
 
-  bool apply(ProtectedIndex& to, ValidationState& state) {
-    if (&to == index_) {
-      // already at this state
-      return true;
-    }
+  // applies commands in range (from; to].
+  bool apply(ProtectedIndex& from, ProtectedIndex& to, ValidationState& state) {
+    assert(from.height < to.height);
+    // exclude 'from' by adding 1
+    Chain<ProtectedIndex> chain(from.height + 1, &to);
+    assert(chain.first());
+    assert(chain.first()->pprev == &from);
 
-    Chain<ProtectedIndex> fork(startHeight_, &to);
-
-    auto* current = const_cast<ProtectedIndex*>(fork.findFork(index_));
-    assert(current);
-
-    // move forward from forkPoint to "to" and apply payloads in between
-
-    // exclude fork point itself
-    current = fork.next(current);
-
-    while (current) {
-      if(!current->isValid()) {
+    for (auto it = chain.begin(), end = chain.end(); it != end; ++it) {
+      if (!it->isValid()) {
+        unapply(*it, from);
         return false;
       }
 
-      if (!applyblock(*current, state)) {
-        return state.Invalid("pop-state-apply-context");
-      }
+      if (!applyBlock(*it, state)) {
+        unapply(*it, from);
 
-      index_ = current;
-
-      if (current != &to) {
-        current = fork.next(current);
-      } else {
-        break;
+        // we tried to apply a block, but found an invalid command.
+        tree().invalidateSubtree(*it, BLOCK_FAILED_POP);
+        return false;
       }
     }
 
-    assert(index_ == &to);
-
+    // this subchain is valid
     return true;
   }
 
-  bool unapplyAndApply(ProtectedIndex& to, ValidationState& state) {
-    if (&to == index_) {
-      // already at this state
-      return true;
-    }
-
-    unapply(to);
-    return apply(to, state);
-  }
-
-  ProtectedIndex* index() { return index_; }
-  const ProtectedIndex* index() const { return index_; }
   ProtectingBlockTree& tree() { return tree_; }
   const ProtectingBlockTree& tree() const { return tree_; }
   const ProtectedChainParams& params() const { return *protectedParams_; }
 
  private:
-  ProtectedIndex* index_;
   ProtectingBlockTree& tree_;
   const ProtectedChainParams* protectedParams_;
-
   height_t startHeight_ = 0;
 };
 

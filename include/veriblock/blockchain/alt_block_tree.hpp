@@ -142,12 +142,11 @@ struct AltTree : public BaseBlockTree<AltBlock> {
 };
 
 template <>
-bool AltTree::PopForkComparator::sm_t::applyContext(
-    const BlockIndex<AltBlock>& index, ValidationState& state);
-
-template <>
-void AltTree::PopForkComparator::sm_t::unapplyContext(
-    const BlockIndex<AltBlock>& index);
+void payloadsToCommands<AltTree>(
+    AltTree& tree,
+    const typename AltTree::hash_t& containing,
+    const typename AltTree::payloads_t& p,
+    std::vector<CommandPtr>& commands);
 
 }  // namespace altintegration
 

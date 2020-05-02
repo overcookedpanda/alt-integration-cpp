@@ -17,24 +17,24 @@
 
 namespace altintegration {
 
-template <typename E, typename ProtectingBlockTree, typename ProtectedTree>
+template <typename ProtectingTree, typename ProtectedTree>
 struct AddEndorsement : public Command {
-  using block_t = typename ProtectingBlockTree::block_t;
-  using endorsement_t = E;
-  using protected_param_t = typename ProtectedTree::params_t;
+  using hash_t = typename ProtectedTree::hash_t;
+  using block_t = typename ProtectingTree::block_t;
+  using endorsement_t = typename ProtectedTree::block_t::endorsement_t;
   using protected_index_t = typename ProtectedTree::index_t;
 
   ~AddEndorsement() override = default;
 
-  explicit AddEndorsement(ProtectingBlockTree& tree,
-                          const protected_param_t& param,
-                          protected_index_t& index,
+  explicit AddEndorsement(ProtectingTree& ing,
+                          ProtectedTree& ed,
+                          const hash_t& index,
                           std::shared_ptr<endorsement_t> e)
-      : tree_(&tree), param_(&param), index_(&index), e_(std::move(e)) {}
+      : ing_(&ing), ed_(&ed), index_(index), e_(std::move(e)) {}
 
   bool Execute(ValidationState& state) override {
     // endorsement validity window
-    auto window = param_->getEndorsementSettlementInterval();
+    auto window = ed_->getParam().getEndorsementSettlementInterval();
     auto minHeight = std::max(index_->height - window, 0);
     Chain<protected_index_t> chain(minHeight, index_);
 
@@ -54,7 +54,7 @@ struct AddEndorsement : public Command {
                            "Endorsed block is on a different chain");
     }
 
-    auto* blockOfProof = tree_->getBlockIndex(e_->blockOfProof);
+    auto* blockOfProof = ing_->getBlockIndex(e_->blockOfProof);
     if (!blockOfProof) {
       return state.Invalid("block-of-proof-not-found",
                            "Can not find block of proof in BTC");
@@ -89,9 +89,9 @@ struct AddEndorsement : public Command {
   }
 
  private:
-  ProtectingBlockTree* tree_;
-  const protected_param_t* param_;
-  protected_index_t* index_;
+  ProtectingTree* ing_;
+  ProtectedTree* ed_;
+  const hash_t index_;
   std::shared_ptr<endorsement_t> e_;
 };
 
@@ -100,11 +100,10 @@ struct VbkBlockTree;
 template <typename Block, typename ChainParams>
 struct BlockTree;
 
-using AddBtcEndorsement = AddEndorsement<BtcEndorsement,
-    BlockTree<BtcBlock, BtcChainParams>,
-    VbkBlockTree>;
+using AddBtcEndorsement =
+    AddEndorsement<BlockTree<BtcBlock, BtcChainParams>, VbkBlockTree>;
 
-using AddVbkEndorsement = AddEndorsement<VbkEndorsement, VbkBlockTree, AltTree>;
+using AddVbkEndorsement = AddEndorsement<VbkBlockTree, AltTree>;
 
 }  // namespace altintegration
 

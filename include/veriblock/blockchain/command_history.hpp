@@ -34,7 +34,7 @@ struct CommandHistory {
     return cmd->Execute(state);
   }
 
-  void save(std::vector<CommandPtr>& out) {
+  void saveAndClear(std::vector<CommandPtr>& out) {
     out.reserve(out.size() + undo_.size());
     for (const auto& cmd : undo_) {
       out.push_back(cmd);

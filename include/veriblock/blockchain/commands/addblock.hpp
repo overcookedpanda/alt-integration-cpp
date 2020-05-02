@@ -23,16 +23,28 @@ struct AddBlock : public Command {
       : tree_(&tree), block_(std::move(block)) {}
 
   bool Execute(ValidationState& state) override {
+    if (tree_->getBlockIndex(block_->getHash)) {
+      // it is duplicate, do not apply block
+      duplicate = true;
+      return true;
+    }
+
     return tree_->acceptBlock(block_, state);
   }
 
-  void UnExecute() override { tree_->removeSubtree(block_->getHash()); }
+  void UnExecute() override {
+    if (!duplicate) {
+      // do not remove block
+      tree_->removeSubtree(block_->getHash());
+    }
+  }
 
   std::string toPrettyString(size_t level = 0) const override;
 
  private:
   Tree* tree_;
   std::shared_ptr<Block> block_;
+  bool duplicate = false;
 };
 
 using AddBtcBlock = AddBlock<BtcBlock, BtcChainParams>;
@@ -42,7 +54,8 @@ template <>
 inline std::string AddBtcBlock::toPrettyString(size_t level) const {
   return std::string(level, ' ') +
          "AddBtcBlock{prev=" + block_->previousBlock.toHex() +
-         ", block=" + block_->getHash().toHex() + "}";
+         ", block=" + block_->getHash().toHex() +
+         ", duplicate=" + std::to_string(duplicate) + "}";
 }
 
 template <>
@@ -50,25 +63,27 @@ inline std::string AddVbkBlock::toPrettyString(size_t level) const {
   return std::string(level, ' ') +
          "AddVbkBlock{prev=" + block_->previousBlock.toHex() +
          ", block=" + block_->getHash().toHex() +
-         ", height=" + std::to_string(block_->height) + "}";
+         ", height=" + std::to_string(block_->height) +
+         ", duplicate=" + std::to_string(duplicate) + "}";
 }
 
 template <typename BlockTree>
-bool addBlock(BlockTree& tree,
+void addBlock(BlockTree& tree,
+              std::unordered_set<typename BlockTree::hash_t>& unique,
               const typename BlockTree::block_t& block,
-              ValidationState& state,
-              CommandHistory& history) {
+              std::vector<CommandPtr>& commands) {
   using block_t = typename BlockTree::block_t;
   using params_t = typename BlockTree::params_t;
-  if (tree.getBlockIndex(block.getHash()) == nullptr) {
+  auto hash = block.getHash();
+  if (unique.insert(hash).second) {
     // we don't know this block, create command
     auto blockPtr = std::make_shared<block_t>(block);
-    auto cmd = std::make_shared<AddBlock<block_t, params_t>>(tree, blockPtr);
-    return history.exec(cmd, state);
+    auto cmd = std::make_shared<AddBlock<block_t, params_t>>(
+        tree, std::move(blockPtr));
+    commands.push_back(std::move(cmd));
   }
 
-  // we already added this block
-  return true;
+  // we already added this block, do nothing
 };
 
 }  // namespace altintegration
