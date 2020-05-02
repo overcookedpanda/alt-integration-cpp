@@ -14,7 +14,7 @@ namespace altintegration {
 struct Command {
   virtual ~Command() = default;
 
-  virtual bool Execute(ValidationState& state, bool *isDuplicate) = 0;
+  virtual bool Execute(ValidationState& state) = 0;
   virtual void UnExecute() = 0;
 
   //! debug method. returns a string describing this command

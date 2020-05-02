@@ -14,6 +14,7 @@
 #include <veriblock/entities/btcblock.hpp>
 #include <veriblock/finalizer.hpp>
 #include <veriblock/state_manager.hpp>
+#include <veriblock/blockchain/commands/commands.hpp>
 #include <veriblock/storage/endorsement_repository.hpp>
 
 namespace altintegration {

@@ -26,7 +26,7 @@ struct AddBlock : public Command {
     return tree_->acceptBlock(block_, state);
   }
 
-  void UnExecute() override { tree_->invalidateBlockByHash(block_->getHash()); }
+  void UnExecute() override { tree_->removeSubtree(block_->getHash()); }
 
   std::string toPrettyString(size_t level = 0) const override;
 
