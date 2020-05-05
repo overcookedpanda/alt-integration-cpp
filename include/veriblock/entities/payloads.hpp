@@ -8,8 +8,8 @@
 
 #include <vector>
 #include <veriblock/entities/altblock.hpp>
-#include <veriblock/entities/altpoptx.hpp>
 #include <veriblock/entities/atv.hpp>
+#include <veriblock/entities/popdata.hpp>
 #include <veriblock/entities/vtb.hpp>
 #include <veriblock/uint.hpp>
 
@@ -18,10 +18,13 @@ namespace altintegration {
 struct AltPayloads {
   using id_t = uint256;
 
+  // TODO(Bogdan): temporary used to disable duplicate check for VTBs
+  static bool checkForDuplicates() { return true; };
+
   AltBlock endorsed;
   AltBlock containingBlock;
   uint256 containingTx;
-  AltPopTx altPopTx;
+  PopData popData;
 
   /**
    * Read VBK data from the stream and convert it to Payloads
