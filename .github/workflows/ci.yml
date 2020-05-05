@@ -119,12 +119,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${PKG_CC} -DCMAKE_CXX_COMPILER=${PKG_CXX} -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
+        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang -DCMAKE_CXX_COMPILER=${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang++ -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
     env:
-      CC: clang
-      CXX: clang++
-      PKG_CC: /home/runner/work/alt-integration-cpp/alt-integration-cpp/cctools/clang/bin/clang
-      PKG_CXX: /home/runner/work/alt-integration-cpp/alt-integration-cpp/cctools/clang/bin/clang++
       PKG_CLANG_VERSION: 6.0.1
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
@@ -182,19 +178,19 @@ jobs:
           mkdir -p libtapi && \
           mkdir -p cctools/clang && \
           rm -f toolchain/lib/libc++abi.so*
-          tar --no-same-owner --strip-components=1 -C cctools/clang -xvf clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+          tar --no-same-owner --strip-components=1 -C cctools/clang -xf clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
           rm -f clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
       - name: install clang+llvm, cctools & libtapi
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         run: |
           cd ${GITHUB_WORKSPACE}/cctools/libtapi
-          CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
-          CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
+          CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
+          CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
           mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
           cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/clang/lib/
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
-          CC=${PKG_CC} CXX=${PKG_CXX} && ./configure \
+          CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ && ./configure \
               --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
               --with-libtapi=${GITHUB_WORKSPACE}/cctools \
               --target=x86_64-apple-darwin16
@@ -205,9 +201,9 @@ jobs:
           wget -P ${GITHUB_WORKSPACE}/sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
           mkdir -p ${GITHUB_WORKSPACE}/SDKs
           tar -xf ${GITHUB_WORKSPACE}/sdk-sources/MacOSX10.14.sdk.tar.xz -C ${GITHUB_WORKSPACE}/SDKs
-#      - name: cmake
-#        run: cmake . -Bbuild ${{ matrix.flags }}
-#      - name: build
-#        run: cmake --build build -- -j2
-#      - name: test
-#        run: cd build && ctest
+      - name: cmake
+        run: cmake . -Bbuild ${{ matrix.flags }}
+      - name: build
+        run: cmake --build build -- -j2
+      - name: test
+        run: cd build && ctest
