@@ -123,8 +123,8 @@ jobs:
     env:
       CC: clang
       CXX: clang++
-      PKG_CC: ${GITHUB_WORKSPACE}/cctools/clang/bin/clang
-      PKG_CXX: ${GITHUB_WORKSPACE}/cctools/clang/bin/clang++
+      PKG_CC: /home/runner/work/alt-integration-cpp/alt-integration-cpp/cctools/clang/bin/clang
+      PKG_CXX: /home/runner/work/alt-integration-cpp/alt-integration-cpp/cctools/clang/bin/clang++
       PKG_CLANG_VERSION: 6.0.1
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
