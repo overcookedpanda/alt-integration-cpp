@@ -116,14 +116,14 @@ jobs:
 
   x86_64-apple-darwin16:
     runs-on: ubuntu-18.04
-    container: veriblock/alt-integration-cpp-dev
     strategy:
       fail-fast: false
       matrix:
         flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_ROOT_PATH=${GITHUB_WORKSPACE}/cctools/bin -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
     env:
-      CC: clang
-      CXX: clang++
+      CC: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang
+      CXX: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang++
+      PKG_CLANG_VERSION: 6.0.1
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
       - uses: actions/checkout@v1
@@ -160,27 +160,38 @@ jobs:
         with:
           repository: tpoechtrager/cctools-port
           ref: 3764b223c011574971ee3ae09ce968ba5dc2f00f
-          path: native_cctools
+          path: cctools/toolchain
       - name: clone apple-libtapi
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@master
         with:
           repository: tpoechtrager/apple-libtapi
           ref: 3efb201881e7a76a21e0554906cf306432539cef
-          path: apple-libtapi
-      - name: install cctools & libtapi
+          path: cctools/libtapi
+      - name: fetch clang+llvm
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ${GITHUB_WORKSPACE}/cctools
-          cd ${GITHUB_WORKSPACE}/apple-libtapi
-          INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh
-          ./install.sh
-          cd ${GITHUB_WORKSPACE}/native_cctools/cctools
+          wget https://releases.llvm.org/${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+      - name: extract clang+llvm
+        if: steps.cctools-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p cctools && \
+          mkdir -p toolchain/bin toolchain/lib/clang/${PKG_CLANG_VERSION}/include && \
+          mkdir -p libtapi && \
+          rm -f toolchain/lib/libc++abi.so*
+          tar --no-same-owner --strip-components=1 -xf ${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+      - name: install clang+llvm, cctools & libtapi
+        if: steps.cctools-cache.outputs.cache-hit != 'true'
+        run: |
+          cd ${GITHUB_WORKSPACE}/cctools/libtapi
+          INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
+          INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
+          sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
+          cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           ./configure \
-              --prefix=${GITHUB_WORKSPACE}/cctools \
-              --with-libtapi=${GITHUB_WORKSPACE}/cctools \
+              --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
+              --with-libtapi=${GITHUB_WORKSPACE}/cctools/toolchain \
               --target=x86_64-apple-darwin16
-          make
           make install
       - name: download and extract macos sdk
         if: steps.sdk-cache.outputs.cache-hit != 'true'
