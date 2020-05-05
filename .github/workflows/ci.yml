@@ -119,7 +119,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
+        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${PKG_CC} -DCMAKE_CXX_COMPILER=${PKG_CXX} -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
     env:
       CC: clang
       CXX: clang++
@@ -143,7 +143,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/cache@v1.1.0
         with:
-          path: ${GITHUB_WORKSPACE}/cctools
+          path: cctools
           key: cctools-cache-${{ steps.cache_timestamp.outputs.timestamp }}
           restore-keys: |
             cctools-cache-
@@ -152,7 +152,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/cache@v1.1.0
         with:
-          path: ${GITHUB_WORKSPACE}/SDKs
+          path: SDKs
           key: sdk-cache-${{ steps.cache_timestamp.outputs.timestamp }}
           restore-keys: |
             sdk-cache-
