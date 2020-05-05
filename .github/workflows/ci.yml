@@ -136,22 +136,16 @@ jobs:
           echo "::set-output name=timestamp::${current_date}"
       - name: cctools cache files
         id: cctools-cache
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/cache@v1.1.0
         with:
-          path: cctools
-          key: cctools-cache-${{ steps.cache_timestamp.outputs.timestamp }}
-          restore-keys: |
-            cctools-cache-
+          path: cctools/toolchain
+          key: cctools-cache
       - name: sdk cache files
         id: sdk-cache
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/cache@v1.1.0
         with:
           path: SDKs
-          key: sdk-cache-${{ steps.cache_timestamp.outputs.timestamp }}
-          restore-keys: |
-            sdk-cache-
+          key: sdk-cache
       - name: clone native_cctools
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@master
