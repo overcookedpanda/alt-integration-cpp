@@ -121,8 +121,10 @@ jobs:
       matrix:
         flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
     env:
-      CC: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang
-      CXX: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang++
+      CC: clang
+      CXX: clang++
+      PKG_CC: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang
+      PKG_CXX: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/clang++
       PKG_CLANG_VERSION: 6.0.1
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
@@ -184,8 +186,8 @@ jobs:
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         run: |
           cd ${GITHUB_WORKSPACE}/cctools/libtapi
-          INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
-          INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
+          CC=${PKG_CC} CXX={PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
+          CC=${PKG_CC} CXX={PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           ./configure \
