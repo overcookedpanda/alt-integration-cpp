@@ -147,13 +147,13 @@ jobs:
         run: |
           mkdir -p ${GITHUB_WORKSPACE}/cctools
           cd ${GITHUB_WORKSPACE}/apple-libtapi
-          [INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools] ./build.sh
+          INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh
           ./install.sh
           cd native_cctools/cctools
           ./configure \
-              [--prefix=/${GITHUB_WORKSPACE}/cctools] \
-              [--with-libtapi=${GITHUB_WORKSPACE}/cctools] \
-              [--target=x86_64-apple-darwin16]
+              --prefix=/${GITHUB_WORKSPACE}/cctools \
+              --with-libtapi=${GITHUB_WORKSPACE}/cctools \
+              --target=x86_64-apple-darwin16
           make
           make install
       - name: download and extract macos sdk
