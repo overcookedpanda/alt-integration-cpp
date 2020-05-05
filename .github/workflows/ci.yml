@@ -140,7 +140,7 @@ jobs:
       - name: clone apple-libtapi
         uses: actions/checkout@master
         with:
-          respositry: tpoechtrager/apple-libtapi
+          repository: tpoechtrager/apple-libtapi
           ref: 3efb201881e7a76a21e0554906cf306432539cef
           path: apple-libtapi
       - name: install cctools & libtapi
