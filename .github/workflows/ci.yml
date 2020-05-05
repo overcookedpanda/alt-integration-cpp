@@ -120,10 +120,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=SDKs/MacOSX10.14.sdk"]
+        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
     env:
-      CC: clang
-      CXX: clang++
+      CC: clang -B${GITHUB_WORKSPACE}/cctools
+      CXX: clang++ -B${GITHUB_WORKSPACE}/cctools
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
       - uses: actions/checkout@v1
@@ -177,7 +177,7 @@ jobs:
           ./install.sh
           cd ${GITHUB_WORKSPACE}/native_cctools/cctools
           ./configure \
-              --prefix=/${GITHUB_WORKSPACE}/cctools \
+              --prefix=${GITHUB_WORKSPACE}/cctools \
               --with-libtapi=${GITHUB_WORKSPACE}/cctools \
               --target=x86_64-apple-darwin16
           make
@@ -185,9 +185,9 @@ jobs:
       - name: download and extract macos sdk
         if: steps.sdk-cache.outputs.cache-hit != 'true'
         run: |
-          wget -P sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
-          mkdir -p SDKs
-          tar -xf sdk-sources/MacOSX10.14.sdk.tar.xz -C SDKs
+          wget -P ${GITHUB_WORKSPACE}/sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
+          mkdir -p ${GITHUB_WORKSPACE}/SDKs
+          tar -xf ${GITHUB_WORKSPACE}/sdk-sources/MacOSX10.14.sdk.tar.xz -C ${GITHUB_WORKSPACE}/SDKs
       - name: cmake
         run: cmake . -Bbuild ${{ matrix.flags }}
       - name: build
