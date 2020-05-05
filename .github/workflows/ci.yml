@@ -120,10 +120,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
+        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_ROOT_PATH=${GITHUB_WORKSPACE}/cctools/bin -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=${GITHUB_WORKSPACE}/SDKs/MacOSX10.14.sdk"]
     env:
-      CC: clang -B${GITHUB_WORKSPACE}/cctools
-      CXX: clang++ -B${GITHUB_WORKSPACE}/cctools
+      CC: clang
+      CXX: clang++
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
       - uses: actions/checkout@v1
