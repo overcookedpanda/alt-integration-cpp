@@ -114,3 +114,31 @@ jobs:
       - name: test
         run: cd build && ctest
 
+  x86_64-apple-darwin16:
+    runs-on: ubuntu-18.04
+    container: veriblock/alt-integration-cpp-dev
+    strategy:
+      fail-fast: false
+      matrix:
+        flags: ["-DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_C_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_CXX_COMPILER_TARGET=x86_64-apple-darwin16 -DCMAKE_OSX_SYSROOT=SDKs/MacOSX10.14.sdk"]
+    env:
+      CC: clang
+      CXX: clang++
+      CTEST_OUTPUT_ON_FAILURE: 1
+    steps:
+      - uses: actions/checkout@v1
+        name: checkout
+        with:
+          submodules: recursive
+          clean: true
+      - name: download and extract macos sdk
+        run: |
+          wget -P sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
+          mkdir -p SDKs
+          tar -xf sdk-sources/MacOSX10.14.sdk.tar.xz -C SDKs
+      - name: cmake
+        run: cmake . -Bbuild ${{ matrix.flags }}
+      - name: build
+        run: cmake --build build -- -j2
+      - name: test
+        run: cd build && ctest
