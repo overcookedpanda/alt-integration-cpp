@@ -184,16 +184,16 @@ jobs:
               --with-libtapi=${GITHUB_WORKSPACE}/cctools \
               --target=x86_64-apple-darwin16
           make install
-          cd ${GITHUB_WORKSPACE}/cctools/toolchain && \
-          mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/lib/clang/${PKG_CLANG_VERSION}/include && \
-          mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/bin ${GITHUB_WORKSPACE}/cctools/clang/include && \
-          cp bin/clang ${GITHUB_WORKSPACE}/cctools/clang/bin/ && \
-          cp -P bin/clang++ ${GITHUB_WORKSPACE}/cctools/clang/bin/ && \
-          cp lib/libLTO.so ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
-          cp -rf lib/clang/${PKG_CLANG_VERSION}/include/* ${GITHUB_WORKSPACE}/cctools/clang/lib/clang/${PKG_CLANG_VERSION}/include/ && \
-          cp bin/llvm-dsymutil ${GITHUB_WORKSPACE}/cctools/clang/bin/x86_64-apple-darwin16-dsymutil && \
-          if `test -d include/c++/`; then cp -rf include/c++/ ${GITHUB_WORKSPACE}/cctools/clang/include/; fi && \
-          if `test -d lib/c++/`; then cp -rf lib/c++/ ${GITHUB_WORKSPACE}/cctools/clang/lib/; fi
+          cd ${GITHUB_WORKSPACE}/cctools/clang && \
+#          mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/lib/clang/${PKG_CLANG_VERSION}/include && \
+#          mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/bin ${GITHUB_WORKSPACE}/cctools/clang/include && \
+          cp bin/clang ${GITHUB_WORKSPACE}/cctools/toolchain/bin/ && \
+          cp -P bin/clang++ ${GITHUB_WORKSPACE}/cctools/toolchain/bin/
+#          cp lib/libLTO.so ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
+#          cp -rf lib/clang/${PKG_CLANG_VERSION}/include/* ${GITHUB_WORKSPACE}/cctools/clang/lib/clang/${PKG_CLANG_VERSION}/include/ && \
+#          cp bin/llvm-dsymutil ${GITHUB_WORKSPACE}/cctools/clang/bin/x86_64-apple-darwin16-dsymutil && \
+#          if `test -d include/c++/`; then cp -rf include/c++/ ${GITHUB_WORKSPACE}/cctools/clang/include/; fi && \
+#          if `test -d lib/c++/`; then cp -rf lib/c++/ ${GITHUB_WORKSPACE}/cctools/clang/lib/; fi
       - name: download and extract macos sdk
         if: steps.sdk-cache.outputs.cache-hit != 'true'
         run: |
