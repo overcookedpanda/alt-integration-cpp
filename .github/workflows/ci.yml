@@ -186,8 +186,8 @@ jobs:
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         run: |
           cd ${GITHUB_WORKSPACE}/cctools/libtapi
-          CC=${PKG_CC} CXX={PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
-          CC=${PKG_CC} CXX={PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
+          CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
+          CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           ./configure \
