@@ -191,8 +191,8 @@ jobs:
           CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
           CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
-          mkdir -p ${GITHUB_WORKSPACE}/cctools/lib/ && \
-          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/
+          mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
+          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/clang/lib/
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           CC=${PKG_CC} CXX=${PKG_CXX} && ./configure \
               --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
