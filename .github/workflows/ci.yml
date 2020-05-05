@@ -196,7 +196,7 @@ jobs:
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           CC=${PKG_CC} CXX=${PKG_CXX} && ./configure \
               --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
-              --with-libtapi=${GITHUB_WORKSPACE}/cctools/toolchain \
+              --with-libtapi=${GITHUB_WORKSPACE}/cctools \
               --target=x86_64-apple-darwin16
           make install
       - name: download and extract macos sdk
