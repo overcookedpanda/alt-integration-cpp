@@ -123,8 +123,8 @@ jobs:
     env:
       CC: clang
       CXX: clang++
-      PKG_CC: ${GITHUB_WORKSPACE}/clang/bin/clang
-      PKG_CXX: ${GITHUB_WORKSPACE}/clang/bin/clang++
+      PKG_CC: ${GITHUB_WORKSPACE}/cctools/clang/bin/clang
+      PKG_CXX: ${GITHUB_WORKSPACE}/cctools/clang/bin/clang++
       PKG_CLANG_VERSION: 6.0.1
       CTEST_OUTPUT_ON_FAILURE: 1
     steps:
@@ -180,8 +180,9 @@ jobs:
           mkdir -p cctools && \
           mkdir -p toolchain/bin toolchain/lib/clang/${PKG_CLANG_VERSION}/include && \
           mkdir -p libtapi && \
+          mkdir -p cctools/clang && \
           rm -f toolchain/lib/libc++abi.so*
-          tar --no-same-owner --strip-components=1 -C clang -xvf clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+          tar --no-same-owner --strip-components=1 -C cctools/clang -xvf clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
       - name: install clang+llvm, cctools & libtapi
         if: steps.cctools-cache.outputs.cache-hit != 'true'
         run: |
