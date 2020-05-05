@@ -191,7 +191,7 @@ jobs:
           CC=${PKG_CC} CXX=${PKG_CXX} INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
-          ./configure \
+          CC=${PKG_CC} CXX=${PKG_CXX} && ./configure \
               --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
               --with-libtapi=${GITHUB_WORKSPACE}/cctools/toolchain \
               --target=x86_64-apple-darwin16
@@ -202,9 +202,9 @@ jobs:
           wget -P ${GITHUB_WORKSPACE}/sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
           mkdir -p ${GITHUB_WORKSPACE}/SDKs
           tar -xf ${GITHUB_WORKSPACE}/sdk-sources/MacOSX10.14.sdk.tar.xz -C ${GITHUB_WORKSPACE}/SDKs
-      - name: cmake
-        run: cmake . -Bbuild ${{ matrix.flags }}
-      - name: build
-        run: cmake --build build -- -j2
-      - name: test
-        run: cd build && ctest
+#      - name: cmake
+#        run: cmake . -Bbuild ${{ matrix.flags }}
+#      - name: build
+#        run: cmake --build build -- -j2
+#      - name: test
+#        run: cd build && ctest
