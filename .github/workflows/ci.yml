@@ -204,5 +204,5 @@ jobs:
         run: cmake . -Bbuild ${{ matrix.flags }}
       - name: build
         run: cmake --build build -- -j2
-      - name: test
-        run: cd build && ctest
+      - name: check architectures
+        run: ${GITHUB_WORKSPACE}/cctools/toolchain/bin/x86_64-apple-darwin16-lipo -info ../lib/libveriblock-pop-cpp.a
