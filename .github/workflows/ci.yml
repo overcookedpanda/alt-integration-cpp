@@ -204,7 +204,7 @@ jobs:
           tar -xf ${GITHUB_WORKSPACE}/sdk-sources/MacOSX10.14.sdk.tar.xz -C ${GITHUB_WORKSPACE}/SDKs
       - name: debug lib dir
         run: |
-          ls -la ${GITHUB_WORKSPACE}/cctools/toolchain/lib/
+          ls -la ${GITHUB_WORKSPACE}/cctools/toolchain/
       - name: cmake
         run: cmake . -Bbuild ${{ matrix.flags }}
       - name: build
