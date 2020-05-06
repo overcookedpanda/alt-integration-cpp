@@ -133,8 +133,8 @@ jobs:
         id: toolchain-cache
         uses: actions/cache@v1.1.0
         with:
-          path: cctools/toolchain
-          key: toolchain-cache
+          path: cctools
+          key: toolchain-full-cache
       - name: sdk cache files
         id: sdk-cache
         uses: actions/cache@v1.1.0
