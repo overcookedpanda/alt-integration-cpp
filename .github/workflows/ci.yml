@@ -189,6 +189,7 @@ jobs:
           mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/bin ${GITHUB_WORKSPACE}/cctools/toolchain/include && \
           cp bin/clang ${GITHUB_WORKSPACE}/cctools/toolchain/bin/ && \
           cp -P bin/clang++ ${GITHUB_WORKSPACE}/cctools/toolchain/bin/ && \
+          cp lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           cp lib/libLTO.so ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           cp -rf lib/clang/${PKG_CLANG_VERSION}/include/* ${GITHUB_WORKSPACE}/cctools/toolchain/lib/clang/${PKG_CLANG_VERSION}/include/ && \
           cp bin/llvm-dsymutil ${GITHUB_WORKSPACE}/cctools/toolchain/bin/x86_64-apple-darwin16-dsymutil && \
