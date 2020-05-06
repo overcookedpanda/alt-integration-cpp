@@ -134,7 +134,7 @@ jobs:
         uses: actions/cache@v1.1.0
         with:
           path: cctools/toolchain
-          key: toolchain---cache
+          key: toolchain--cache
       - name: sdk cache files
         id: sdk-cache
         uses: actions/cache@v1.1.0
@@ -142,25 +142,25 @@ jobs:
           path: SDKs
           key: sdk-cache
       - name: clone native_cctools
-#        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@master
         with:
           repository: tpoechtrager/cctools-port
           ref: 3764b223c011574971ee3ae09ce968ba5dc2f00f
           path: cctools/toolchain
       - name: clone apple-libtapi
-#        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@master
         with:
           repository: tpoechtrager/apple-libtapi
           ref: 3efb201881e7a76a21e0554906cf306432539cef
           path: cctools/libtapi
       - name: fetch clang+llvm
-#        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
         run: |
           wget https://releases.llvm.org/${PKG_CLANG_VERSION}/clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
       - name: extract clang+llvm
-#        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p cctools && \
           mkdir -p toolchain/bin toolchain/lib/clang/${PKG_CLANG_VERSION}/include && \
@@ -170,14 +170,16 @@ jobs:
           tar --no-same-owner --strip-components=1 -C cctools/clang -xf clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
           rm -f clang+llvm-${PKG_CLANG_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz
       - name: install clang+llvm, cctools & libtapi
-#        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
         run: |
           cd ${GITHUB_WORKSPACE}/cctools/libtapi
           CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./build.sh && \
           CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
           mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
-          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/clang/lib/
+          mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
+          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
+          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ && ./configure \
               --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
@@ -185,7 +187,6 @@ jobs:
               --target=x86_64-apple-darwin16
           make install
           cd ${GITHUB_WORKSPACE}/cctools/clang && \
-          cp lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/lib/clang/${PKG_CLANG_VERSION}/include && \
           mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/bin ${GITHUB_WORKSPACE}/cctools/toolchain/include && \
           cp -P bin/clang++ ${GITHUB_WORKSPACE}/cctools/toolchain/bin/ && \
@@ -201,6 +202,9 @@ jobs:
           wget -P ${GITHUB_WORKSPACE}/sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
           mkdir -p ${GITHUB_WORKSPACE}/SDKs
           tar -xf ${GITHUB_WORKSPACE}/sdk-sources/MacOSX10.14.sdk.tar.xz -C ${GITHUB_WORKSPACE}/SDKs
+      - name: debug lib dir
+        run: |
+          ls -la ${GITHUB_WORKSPACE}/cctools/toolchain/lib/
       - name: cmake
         run: cmake . -Bbuild ${{ matrix.flags }}
       - name: build
