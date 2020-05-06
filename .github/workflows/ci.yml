@@ -209,4 +209,4 @@ jobs:
         run: |
           OSX_ARCH=$(${GITHUB_WORKSPACE}/cctools/toolchain/bin/x86_64-apple-darwin16-lipo -info ${GITHUB_WORKSPACE}/build/lib/libveriblock-pop-cpp.a) && \
           echo $OSX_ARCH && \
-          [[ $OSX_ARCH == "Non-fat file: libveriblock-pop-cpp.a is architecture: x86_64" ]] && exit 0
+          [[ $OSX_ARCH == "Non-fat file: ${GITHUB_WORKSPACE}/build/lib/libveriblock-pop-cpp.a is architecture: x86_64" ]] && exit 0
