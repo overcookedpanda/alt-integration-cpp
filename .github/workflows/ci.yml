@@ -133,8 +133,8 @@ jobs:
         id: toolchain-cache
         uses: actions/cache@v1.1.0
         with:
-          path: cctools/toolchain
-          key: toolchain--cache
+          path: cctools
+          key: toolchain---cache
       - name: sdk cache files
         id: sdk-cache
         uses: actions/cache@v1.1.0
@@ -177,9 +177,7 @@ jobs:
           CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ INSTALLPREFIX=${GITHUB_WORKSPACE}/cctools ./install.sh && \
           sed -i.old "/define HAVE_PTHREADS/d" ${GITHUB_WORKSPACE}/cctools/toolchain/cctools/ld64/src/ld/InputFiles.h
           mkdir -p ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
-          mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
-          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/clang/lib/ && \
-          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/
+          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/clang/lib/
           cd ${GITHUB_WORKSPACE}/cctools/toolchain/cctools
           CC=${GITHUB_WORKSPACE}/cctools/clang/bin/clang CXX=${GITHUB_WORKSPACE}/cctools/clang/bin/clang++ && ./configure \
               --prefix=${GITHUB_WORKSPACE}/cctools/toolchain \
@@ -190,7 +188,7 @@ jobs:
           mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/lib/clang/${PKG_CLANG_VERSION}/include && \
           mkdir -p ${GITHUB_WORKSPACE}/cctools/toolchain/bin ${GITHUB_WORKSPACE}/cctools/toolchain/include && \
           cp -P bin/clang++ ${GITHUB_WORKSPACE}/cctools/toolchain/bin/ && \
-          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
+          cp lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           cp lib/libLTO.so ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           cp -rf lib/clang/${PKG_CLANG_VERSION}/include/* ${GITHUB_WORKSPACE}/cctools/toolchain/lib/clang/${PKG_CLANG_VERSION}/include/ && \
           cp bin/llvm-dsymutil ${GITHUB_WORKSPACE}/cctools/toolchain/bin/x86_64-apple-darwin16-dsymutil && \
@@ -202,9 +200,6 @@ jobs:
           wget -P ${GITHUB_WORKSPACE}/sdk-sources https://github.com/phracker/MacOSX-SDKs/releases/download/10.15/MacOSX10.14.sdk.tar.xz
           mkdir -p ${GITHUB_WORKSPACE}/SDKs
           tar -xf ${GITHUB_WORKSPACE}/sdk-sources/MacOSX10.14.sdk.tar.xz -C ${GITHUB_WORKSPACE}/SDKs
-      - name: debug lib dir
-        run: |
-          ls -la ${GITHUB_WORKSPACE}/cctools/toolchain/
       - name: cmake
         run: cmake . -Bbuild ${{ matrix.flags }}
       - name: build
