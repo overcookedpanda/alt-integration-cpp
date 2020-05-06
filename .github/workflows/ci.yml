@@ -191,7 +191,7 @@ jobs:
           echo "${GITHUB_WORKSPACE}/cctools/toolchain/lib/ contents" && \
           ls -la ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           cp -P bin/clang++ ${GITHUB_WORKSPACE}/cctools/toolchain/bin/ && \
-          cp lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
+          cp ${GITHUB_WORKSPACE}/cctools/lib/libtapi.so.6 ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
           echo "lib/ contents" && \
           ls -la lib/ && \
           cp lib/libLTO.so ${GITHUB_WORKSPACE}/cctools/toolchain/lib/ && \
